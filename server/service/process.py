@@ -34,3 +34,39 @@ def createJob(form: Form) -> str:
     os.remove(temp_file_path)
 
     return orderid
+
+def isSelfContained(job: Job):
+    # determine if the application is self-contained
+    print("self contained ",job)
+    pass
+
+def createDockerfile(job: Job):
+    # create a dockerfile for it
+    print("self dockerfile ",job)
+    pass
+
+def createDeploymentYaml(job: Job):
+    # create a deployment yaml for the application
+    print("self deployment ",job)
+    pass
+
+def createServiceYaml(job: Job):
+    # create the service yaml for the application
+    print("self service ",job)
+    pass
+
+def noAction(job: Job):
+    pass
+
+def processJob(job: Job):
+    # retrieve the current step
+    currentStep = job.currentStep
+    switcher = {
+        0: isSelfContained,
+        1: createDockerfile,
+        2: createDeploymentYaml,
+        3: createServiceYaml
+    }
+    return switcher.get(currentStep,noAction)(job)
+    
+
