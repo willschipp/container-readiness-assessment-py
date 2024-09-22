@@ -1,18 +1,16 @@
-from flask import Flask, send_from_directory, render_template
+from flask import Flask
 import os
 
-app = Flask(__name__)
+from .handler.routes import main as main_blueprint
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+def init_app(config_name='default'):
+    app = Flask(__name__)
+    app.register_blueprint(main_blueprint)
+    return app
 
-@app.route('/static/<path:filename>')
-def serve_static(filename):
-    root_dir = os.path.dirname(os.getcwd())
-    return send_from_directory(os.path.join(root_dir,'static'),"index.html")    
+app = init_app(os.getenv('FLASK_CONFIG') or 'default')
 
-
+    
 
 if __name__ == "__main__":
     app.run()
