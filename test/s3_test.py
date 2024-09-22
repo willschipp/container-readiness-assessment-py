@@ -1,6 +1,7 @@
 import unittest
 import os
 import tempfile
+import uuid
 
 from server.service.s3 import save
 
@@ -16,7 +17,8 @@ class TestS3(unittest.TestCase):
 
 
     def test_save(self):
-        bucketname = "testbucket"
+        # bucketname = "testbucket"
+        bucketname = str(uuid.uuid4()).replace('-','')
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
             temp_file.write('{"hello":"world"}')
             temp_file_path = temp_file.name

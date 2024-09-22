@@ -9,8 +9,8 @@ def save(file_path, bucket_name, object_name, url, key, secret, secure=False):
         secure=secure
     )
 
-    try:
-        if not client.bucket_exists(bucket_name):
+    try:        
+        if not client.bucket_exists(bucket_name):            
             client.make_bucket(bucket_name)
 
         result = client.fput_object(
