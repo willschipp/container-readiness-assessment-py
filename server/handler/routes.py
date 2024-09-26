@@ -3,6 +3,8 @@ import os
 
 from ..model.form import Form
 
+from ..service.process import createJob
+
 main = Blueprint('main',__name__)
 
 @main.route('/')
@@ -19,10 +21,18 @@ def submit_files():
     if request.is_json:
         data = request.get_json()
 
-        form = Form(**data)
+        if len(data) <= 0:
+            return jsonify({
+                "error":"no payload"
+            }), 500
+        
+        form = Form.from_dict(data)
+
+        # create an order id and send it back
+        orderid = createJob(form)
 
         return jsonify({
-            "orderid":"blah"
+            "orderid":orderid
         }), 200
     else:
         return jsonify({

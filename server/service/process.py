@@ -3,11 +3,14 @@ import tempfile
 import json
 import os
 
+import threading
+import time
+
 from ..model.form import Form
 from ..model.job import Job
 from ..model.form_encoder import FormEncoder
 
-from ..service.s3 import save
+from ..service.s3 import save, listFiles, getBuckets, get
 
 from ..config import config
 
@@ -68,5 +71,51 @@ def processJob(job: Job):
         3: createServiceYaml
     }
     return switcher.get(currentStep,noAction)(job)
-    
+
+def getActiveJobs():
+    #config
+    current_config = config['dev']
+
+    bucket_names = getBuckets(current_config.URL,current_config.KEY,current_config.SECRET)
+    for bucket_name in bucket_names:
+        finished = False
+        # get all the files
+        file_names = listFiles(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
+        for file_name in file_names:
+            # first check for 'finished.json'
+            if file_name == 'finished.json':
+                # done
+                finished = True
+                break
+        
+        if finished == False:
+            # retrieve the job
+            with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+                pass
+            get(temp_file.name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+            # read into json
+            with open(temp_file.name,'r') as job_file:
+                data = json.load(job_file)
+            job = Job.from_dict(data)
+            # clean up
+            os.remove(temp_file.name)
+            # process job
+            processJob(job)        
+
+
+def background_process():
+    while True:
+        # get all the buckets from s3
+        # for each bucket, check for "finished.json"
+        # if doesn't exist, retrieve the job.json
+        # pass it to processjob
+        getActiveJobs()
+        # now pause
+        time.sleep(5)
+
+def start_background():
+    bg_thread = threading.Thread(target=background_process)
+    bg_thread.daemon = True
+    bg_thread.start()
+
 
