@@ -5,10 +5,13 @@ from ..config import config
 
 # Gemini Request Payload
 gemini_request_template = '''
-    {"contents":
+    {
+    "contents":
         [
-            {"parts":[
-                {"text":"CONTENT_HERE"}
+            {
+            "parts":
+                [
+                    {"text":"CONTENT_HERE"}
                 ]
             }
         ]
@@ -22,9 +25,11 @@ def callGemini(prompt: str) -> str:
     url = current_config.LLM_URL
     url = url.replace("API_KEY",current_config.LLM_KEY)
 
+    print(final_prompt)
+
     try:
         headers = {"Content-type":"application/json"}
-        response = requests.post(url,json=final_prompt,headers=headers)
+        response = requests.post(url,data=final_prompt,headers=headers)
         # process response body into the json object
         response.raise_for_status()
         return str(response.json)
