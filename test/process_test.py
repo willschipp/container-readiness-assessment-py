@@ -78,34 +78,69 @@ class TestProcess(unittest.TestCase):
     #     # execute
     #     isSelfContained(job)
 
-    def test_noAction(self):
-        # create a bucket called 1234
+    # def test_noAction(self):
+    #     # create a bucket called 1234
+    #     bucketname = str(uuid.uuid4()).replace('-','')
+    #     create_bucket(bucketname,self.url,self.key,self.secret)
+    #     # create a form
+    #     form = Form(
+    #         user_id="jdoe",
+    #         app_id="1234",
+    #         app_language="java",
+    #         config_text="blah blah blah"
+    #     )        
+    #     # create job
+    #     job = Job(
+    #         order_id=bucketname,
+    #         current_step=0,
+    #         form=form
+    #     )
+    #     # invoke
+    #     step_finished_job(job)
+    #     # now check if there's a "finished.json" in the bucket
+    #     has_file = False
+    #     files = list_files(bucketname,self.url,self.key,self.secret)
+    #     for file in files:
+    #         if file == "finished.json":
+    #             has_file = True
+    #             break
+    #     self.assertTrue(has_file)
+
+    def test_step_is_self_contained(self):
+        #load up the sameple data 
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+        # load up the file
+        with open(file_path,'r') as input:
+            content = input.read()
+
         bucketname = str(uuid.uuid4()).replace('-','')
         create_bucket(bucketname,self.url,self.key,self.secret)
-        # create a form
+
         form = Form(
             user_id="jdoe",
             app_id="1234",
             app_language="java",
-            config_text="blah blah blah"
-        )        
+            config_text=content
+        )    
         # create job
         job = Job(
             order_id=bucketname,
             current_step=0,
             form=form
-        )
-        # invoke
-        step_finished_job(job)
-        # now check if there's a "finished.json" in the bucket
+        )            
+        # now invoke
+        step_is_self_contained(job)
+        # check if the file exists
         has_file = False
         files = list_files(bucketname,self.url,self.key,self.secret)
         for file in files:
-            if file == "finished.json":
+            if file == "answer_0.json":
                 has_file = True
                 break
         self.assertTrue(has_file)
 
+#TODO create "opposite" of 'yes' parse
 
 
 if __name__ == '__main__':

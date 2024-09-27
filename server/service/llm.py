@@ -1,10 +1,15 @@
-import requests
 import json
+import logging
+import requests
+
 
 import xml.etree.ElementTree as Element
 
-from ..model.response import GeminiReponse
+from ..model.response import GeminiResponse
 from ..config import config
+from ..logging_config import setup_logging
+
+logger = setup_logging()
 
 # Gemini Request Payload
 gemini_request_template = '''
@@ -28,16 +33,17 @@ def call_gemini(prompt: str) -> str:
     url = current_config.LLM_URL
     url = url.replace("API_KEY",current_config.LLM_KEY)
 
-    print(final_prompt)
+    logging.debug(final_prompt)
 
     try:
         headers = {"Content-type":"application/json"}
         response = requests.post(url,data=final_prompt,headers=headers)
         # process response body into the json object
         response.raise_for_status()
-        return str(response.json)
+        response_string = json.dumps(response.json())
+        return response_string
     except requests.exceptions.RequestException as err:
-        print(f"an error occurred: {err}")
+        logging.error(f"an error occurred: {err}")
         return None
 
 

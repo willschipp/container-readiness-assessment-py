@@ -8,11 +8,11 @@ from .config import Config
 from .job import Job
 from .order import Order
 from .prompt import Prompt
-from .response import GeminiReponse
+from .response import GeminiResponse
 
 class Encoder(JSONEncoder):
     def default(self, obj):
-        if isinstance(obj,(Form,AppLanguage,Config,Job,Order,Prompt,GeminiReponse)):
+        if isinstance(obj,(Form,AppLanguage,Config,Job,Order,Prompt,GeminiResponse)):
             return obj.__dict__
         return super().default(obj)
     

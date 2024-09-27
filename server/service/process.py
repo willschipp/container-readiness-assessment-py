@@ -1,27 +1,31 @@
-import uuid
-import tempfile
 import json
+import logging
 import os
-
+import tempfile
 import threading
 import time
+import uuid
 
 from ..model.form import Form
 from ..model.job import Job
+from ..model.response import GeminiResponse, parse_json_to_gemini_response
 from ..model.encoder import Encoder, load_prompts
 
 from ..service.s3 import save_file, list_files, get_buckets, get_file
 from ..service.llm import call_gemini, clean_string
 
 from ..config import config
+from ..logging_config import setup_logging
 
 # globals
 prompts = []
 
+logger = setup_logging()
+
 def load():
     global prompts
     if len(prompts) <= 0:
-        print("prompts loaded")
+        logger.info("prompts loaded")
         prompts = load_prompts()
 
 
@@ -44,6 +48,7 @@ def create_job(form: Form) -> str:
 
     save_file(temp_file_path,order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
 
+    logger.info(f"job {job.order_id} created and saved")
     # clean up the file
     os.remove(temp_file_path)
 
@@ -53,12 +58,11 @@ def step_is_self_contained(job: Job):
     # load up the prompts
     load()    
     # determine if the application is self-contained
-    print("self contained ",job) # TODO fix for overall logging
+    logger.info(f"self contained {job}")
     # get the config text
     config_text = clean_string(job.form.config_text)
     # get the prompts
     for p in prompts:
-        print(p)
         if p.step == 0:
             # use this one
             # prompt_string = p.prompt + ' ' + job.form.configtext # add a string gap            
@@ -68,7 +72,35 @@ def step_is_self_contained(job: Job):
     # send to the LLM
     result = call_gemini(prompt_string)
     # now parse the string
+    logger.info(f"result {result}")
+    # parse into the response
+    response = parse_json_to_gemini_response(result)
+    answer = response.candidates[0].content.parts[0].text #location of the detailed response
     # if it has 'yes' --> increment the step in the job to '1'
+    if 'yes'.lower() in answer.lower():
+        # save the answer
+        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+            temp_file.write(result)
+            temp_file_path = temp_file.name    
+        # save
+        current_config = config['dev']                
+        save_file(temp_file_path,job.order_id,"answer_0.json",current_config.URL,current_config.KEY,current_config.SECRET)
+        # update the job to step 1
+        job.current_step = 1
+        # save the job
+        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+            json_string = json.dumps(job,cls=Encoder)
+            temp_file.write(json_string)
+            temp_file_path = temp_file.name
+
+        save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+
+        logger.info(f"job {job.order_id} updated and saved")
+    else:
+        logger.info("Not able to containerize")
+        logger.debug(f"response {answer} for {job}")
+        step_finished_job(job)
+        pass
     # if it doesn't --> increment the step to '5' (exit out)
     # update the job outcome
     return
