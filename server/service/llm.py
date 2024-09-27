@@ -1,6 +1,8 @@
 import requests
 import json
 
+import xml.etree.ElementTree as Element
+
 from ..model.response import GeminiReponse
 from ..config import config
 
@@ -53,7 +55,7 @@ def escape_xml_for_json(xml_string):
     # Remove the surrounding quotes added by json.dumps()
     return json_escaped_xml[1:-1]
 
-def escape_gradle_for_json(code):
+def escape_other_for_json(code):
     # Remove any leading/trailing whitespace
     code = code.strip()
     
@@ -64,3 +66,13 @@ def escape_gradle_for_json(code):
     escaped_code = escaped_code[1:-1]
     
     return escaped_code
+
+def clean_string(code):
+    # check what type of string it is (XML or other)
+    try:
+        Element.fromstring(code) # convert to XML
+        # if we made it here - it's XML        
+        return escape_xml_for_json(code)
+    except Element.ParseError:
+        # if we're here, it's not XML
+        return escape_other_for_json(code)

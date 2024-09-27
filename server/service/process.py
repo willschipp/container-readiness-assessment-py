@@ -11,7 +11,7 @@ from ..model.job import Job
 from ..model.encoder import Encoder, loadPrompts
 
 from ..service.s3 import save, listFiles, getBuckets, get
-from ..service.llm import callGemini
+from ..service.llm import callGemini, clean_string
 
 from ..config import config
 
@@ -53,13 +53,16 @@ def isSelfContained(job: Job):
     # load up the prompts
     load()    
     # determine if the application is self-contained
-    print("self contained ",job)
+    print("self contained ",job) # TODO fix for overall logging
+    # get the config text
+    config_text = clean_string(job.form.configtext)
     # get the prompts
     for p in prompts:
         print(p)
         if p.step == 0:
             # use this one
-            prompt_string = p.prompt + ' ' + job.form.configtext # add a string gap            
+            # prompt_string = p.prompt + ' ' + job.form.configtext # add a string gap            
+            prompt_string = p.prompt + ' ' + config_text # add a string gap            
             break          
 
     # send to the LLM
