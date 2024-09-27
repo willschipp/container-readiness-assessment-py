@@ -1,0 +1,20 @@
+{
+    "prompts":[
+        {
+            "name":"Application",
+            "prompt":"Analyze the following and answer only yes or no if the build file describes an application that could run on kubernetes."
+        },
+        {
+            "name":"Dockerfile - Java",
+            "prompt":"Create a dockerfile for the following and use 'openjdk:24-ea-16-jdk-slim-bullseye' as the from image."
+        },
+        {
+            "name":"Deployment YAML",
+            "prompt":"Create a kubernetes deployment.yaml for the following."
+        },
+        {
+            "name":"Service YAML",
+            "prompt":"Create a kubernetes service.yaml using a LoadBalancer for the following."
+        }
+    ]
+}

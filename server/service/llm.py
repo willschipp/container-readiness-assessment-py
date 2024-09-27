@@ -1,4 +1,5 @@
 import requests
+import json
 
 from ..model.response import GeminiReponse
 from ..config import config
@@ -37,3 +38,29 @@ def callGemini(prompt: str) -> str:
         print(f"an error occurred: {err}")
         return None
 
+
+def escape_xml_for_json(xml_string):
+    # First, escape special characters in the XML
+    escaped_xml = xml_string.replace('&', '&amp;')
+    escaped_xml = escaped_xml.replace('<', '&lt;')
+    escaped_xml = escaped_xml.replace('>', '&gt;')
+    escaped_xml = escaped_xml.replace('"', '&quot;')
+    escaped_xml = escaped_xml.replace("'", '&apos;')
+    
+    # Then, escape the result for JSON
+    json_escaped_xml = json.dumps(escaped_xml)
+    
+    # Remove the surrounding quotes added by json.dumps()
+    return json_escaped_xml[1:-1]
+
+def escape_gradle_for_json(code):
+    # Remove any leading/trailing whitespace
+    code = code.strip()
+    
+    # Use json.dumps() to properly escape the string
+    escaped_code = json.dumps(code)
+    
+    # Remove the surrounding quotes added by json.dumps()
+    escaped_code = escaped_code[1:-1]
+    
+    return escaped_code
