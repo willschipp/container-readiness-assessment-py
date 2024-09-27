@@ -2,16 +2,16 @@ from dataclasses import dataclass
 
 @dataclass
 class Form:
-    userid: str
-    appid: str
-    applanguage: str
-    configtext: str
+    user_id: str
+    app_id: str
+    app_language: str
+    config_text: str
 
     @classmethod
     def from_dict(cls, data):
         return cls(
-            userid = data.get('userid'),
-            appid = data.get('appid'),
-            applanguage = data.get('applanguage'),
-            configtext = data.get('configtext')
+            user_id = data.get('user_id'),
+            app_id = data.get('app_id'),
+            app_language = data.get('app_language'),
+            config_text = data.get('config_text')
         )

@@ -22,7 +22,7 @@ class TestServer(unittest.TestCase):
         self.assertIn(b'Home',response.data)
 
     def test_submit_files(self):
-        form = Form(userid="userid",appid="blah",applanguage="java",configtext="other")
+        form = Form(user_id="userid",app_id="blah",app_language="java",config_text="other")
         response = self.client.post('/api/order',
                                     data=json.dumps(form,cls=Encoder),
                                     content_type='application/json')        

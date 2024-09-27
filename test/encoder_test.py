@@ -1,7 +1,7 @@
 import unittest
 import json
 
-from server.model.encoder import Encoder, loadPrompts
+from server.model.encoder import Encoder, load_prompts
 from server.model.form import Form
 
 class TestFormEncoder(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestFormEncoder(unittest.TestCase):
         self.assertEqual(json.loads(json_str),expected_json)
 
     def test_loadPrompts(self):
-        prompts = loadPrompts()
+        prompts = load_prompts()
         self.assertTrue(len(prompts) >= 4)
 
 

@@ -13,7 +13,7 @@ class TestSubmitFiles(unittest.TestCase):
 
     def test_submit_files_success(self):
         # Test successful JSON submission
-        form = Form(userid="hello",appid="1234",applanguage="java",configtext="blah")
+        form = Form(user_id="hello",app_id="1234",app_language="java",config_text="blah")
         json_str = json.dumps(form,cls=Encoder)
         headers = {"Content-type":"application/json"}
         response = self.client.post('/api/order', data=json_str,headers=headers)

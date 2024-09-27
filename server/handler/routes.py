@@ -3,7 +3,7 @@ import os
 
 from ..model.form import Form
 
-from ..service.process import createJob
+from ..service.process import create_job
 
 main = Blueprint('main',__name__)
 
@@ -29,7 +29,7 @@ def submit_files():
         form = Form.from_dict(data)
 
         # create an order id and send it back
-        orderid = createJob(form)
+        orderid = create_job(form)
 
         return jsonify({
             "orderid":orderid

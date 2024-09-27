@@ -2,7 +2,7 @@ import unittest
 import os
 import json
 
-from server.service.llm import callGemini, escape_other_for_json, escape_xml_for_json, clean_string
+from server.service.llm import call_gemini, escape_other_for_json, escape_xml_for_json, clean_string
 
 class TestProcess(unittest.TestCase):
 

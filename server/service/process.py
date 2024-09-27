@@ -8,10 +8,10 @@ import time
 
 from ..model.form import Form
 from ..model.job import Job
-from ..model.encoder import Encoder, loadPrompts
+from ..model.encoder import Encoder, load_prompts
 
-from ..service.s3 import save, listFiles, getBuckets, get
-from ..service.llm import callGemini, clean_string
+from ..service.s3 import save_file, list_files, get_buckets, get_file
+from ..service.llm import call_gemini, clean_string
 
 from ..config import config
 
@@ -22,15 +22,15 @@ def load():
     global prompts
     if len(prompts) <= 0:
         print("prompts loaded")
-        prompts = loadPrompts()
+        prompts = load_prompts()
 
 
-def createJob(form: Form) -> str:
+def create_job(form: Form) -> str:
     # create a job object
-    orderid = str(uuid.uuid4()).replace('-','')
+    order_id = str(uuid.uuid4()).replace('-','')
     job = Job(
-        orderid=orderid,
-        currentStep=0,
+        order_id=order_id,
+        current_step=0,
         form=form
     )
     # persist job object by writing it out to json
@@ -42,20 +42,20 @@ def createJob(form: Form) -> str:
     # file is written --> save
     current_config = config['dev']
 
-    save(temp_file_path,orderid,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+    save_file(temp_file_path,order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
 
     # clean up the file
     os.remove(temp_file_path)
 
-    return orderid
+    return order_id
 
-def isSelfContained(job: Job):
+def step_is_self_contained(job: Job):
     # load up the prompts
     load()    
     # determine if the application is self-contained
     print("self contained ",job) # TODO fix for overall logging
     # get the config text
-    config_text = clean_string(job.form.configtext)
+    config_text = clean_string(job.form.config_text)
     # get the prompts
     for p in prompts:
         print(p)
@@ -66,29 +66,29 @@ def isSelfContained(job: Job):
             break          
 
     # send to the LLM
-    result = callGemini(prompt_string)
+    result = call_gemini(prompt_string)
     # now parse the string
     # if it has 'yes' --> increment the step in the job to '1'
     # if it doesn't --> increment the step to '5' (exit out)
     # update the job outcome
     return
 
-def createDockerfile(job: Job):
+def step_create_dockerfile(job: Job):
     # create a dockerfile for it
     print("self dockerfile ",job)
     pass
 
-def createDeploymentYaml(job: Job):
+def step_create_deployment_yaml(job: Job):
     # create a deployment yaml for the application
     print("self deployment ",job)
     pass
 
-def createServiceYaml(job: Job):
+def step_create_service_yaml(job: Job):
     # create the service yaml for the application
     print("self service ",job)
     pass
 
-def noAction(job: Job):
+def step_finished_job(job: Job):
     # create the "finished.json" file and write it back
     with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
         temp_file.write('')
@@ -96,31 +96,31 @@ def noAction(job: Job):
     
     # file is written --> save
     current_config = config['dev']
-    save(temp_file_path,job.orderid,"finished.json",current_config.URL,current_config.KEY,current_config.SECRET)
+    save_file(temp_file_path,job.order_id,"finished.json",current_config.URL,current_config.KEY,current_config.SECRET)
     # clean up the file
     os.remove(temp_file_path)
     return
 
-def processJob(job: Job):
+def process_job(job: Job):
     # retrieve the current step
-    currentStep = job.currentStep
+    currentStep = job.current_step
     switcher = {
-        0: isSelfContained,
-        1: createDockerfile,
-        2: createDeploymentYaml,
-        3: createServiceYaml
+        0: step_is_self_contained,
+        1: step_create_dockerfile,
+        2: step_create_deployment_yaml,
+        3: step_create_service_yaml
     }
-    return switcher.get(currentStep,noAction)(job)
+    return switcher.get(currentStep,step_finished_job)(job)
 
-def getActiveJobs():
+def find_active_jobs():
     #config
     current_config = config['dev']
 
-    bucket_names = getBuckets(current_config.URL,current_config.KEY,current_config.SECRET)
+    bucket_names = get_buckets(current_config.URL,current_config.KEY,current_config.SECRET)
     for bucket_name in bucket_names:
         finished = False
         # get all the files
-        file_names = listFiles(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
+        file_names = list_files(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
         for file_name in file_names:
             # first check for 'finished.json'
             if file_name == 'finished.json':
@@ -132,7 +132,7 @@ def getActiveJobs():
             # retrieve the job
             with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
                 pass
-            get(temp_file.name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+            get_file(temp_file.name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
             # read into json
             with open(temp_file.name,'r') as job_file:
                 data = json.load(job_file)
@@ -140,17 +140,17 @@ def getActiveJobs():
             # clean up
             os.remove(temp_file.name)
             # process job
-            processJob(job)        
+            process_job(job)        
 
-def backgroundProcess():
+def background_process():
     while True:
         # run
-        getActiveJobs()
+        find_active_jobs()
         # now pause
         time.sleep(5)
 
-def startBackground():
-    bg_thread = threading.Thread(target=backgroundProcess)
+def start_background():
+    bg_thread = threading.Thread(target=background_process)
     bg_thread.daemon = True
     bg_thread.start()
 

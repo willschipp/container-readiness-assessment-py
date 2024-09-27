@@ -7,8 +7,8 @@ import uuid
 
 from server.model.form import Form
 from server.model.job import Job
-from server.service.process import createJob, processJob, startBackground, isSelfContained, noAction
-from server.service.s3 import createBucket, listFiles, cleanUp
+from server.service.process import create_job, process_job, start_background, step_is_self_contained, step_finished_job
+from server.service.s3 import create_bucket, list_files, clean_up
 
 class TestProcess(unittest.TestCase):
 
@@ -18,7 +18,7 @@ class TestProcess(unittest.TestCase):
         self.key = "gjUHI2lScQ6JhwnbBkas"
 
     def tearDown(self):
-        cleanUp(self.url,self.key,self.secret)        
+        clean_up(self.url,self.key,self.secret)        
 
 
     # def test_createJob(self):
@@ -81,25 +81,25 @@ class TestProcess(unittest.TestCase):
     def test_noAction(self):
         # create a bucket called 1234
         bucketname = str(uuid.uuid4()).replace('-','')
-        createBucket(bucketname,self.url,self.key,self.secret)
+        create_bucket(bucketname,self.url,self.key,self.secret)
         # create a form
         form = Form(
-            userid="jdoe",
-            appid="1234",
-            applanguage="java",
-            configtext="blah blah blah"
+            user_id="jdoe",
+            app_id="1234",
+            app_language="java",
+            config_text="blah blah blah"
         )        
         # create job
         job = Job(
-            orderid=bucketname,
-            currentStep=0,
+            order_id=bucketname,
+            current_step=0,
             form=form
         )
         # invoke
-        noAction(job)
+        step_finished_job(job)
         # now check if there's a "finished.json" in the bucket
         has_file = False
-        files = listFiles(bucketname,self.url,self.key,self.secret)
+        files = list_files(bucketname,self.url,self.key,self.secret)
         for file in files:
             if file == "finished.json":
                 has_file = True

@@ -1,7 +1,7 @@
 from minio import Minio
 from minio.error import S3Error
 
-def save(file_path, bucket_name, object_name, url, key, secret, secure=False):
+def save_file(file_path, bucket_name, object_name, url, key, secret, secure=False):
     client = Minio(
         url,
         access_key=key,
@@ -22,7 +22,7 @@ def save(file_path, bucket_name, object_name, url, key, secret, secure=False):
     except S3Error as err:
         print("error ", err)
 
-def get(file_path,bucket_name,object_name,url,key, secret, secure=False):
+def get_file(file_path,bucket_name,object_name,url,key, secret, secure=False):
     client = Minio(
         url,
         access_key=key,
@@ -38,7 +38,7 @@ def get(file_path,bucket_name,object_name,url,key, secret, secure=False):
     except S3Error as err:
         print("error ", err)
 
-def getBuckets(url,key,secret,secure=False):
+def get_buckets(url,key,secret,secure=False):
     client = Minio(
         url,
         access_key=key,
@@ -57,7 +57,7 @@ def getBuckets(url,key,secret,secure=False):
     except S3Error as err:
         print("error ",err)      
 
-def listFiles(bucket_name,url,key,secret,secure=False):
+def list_files(bucket_name,url,key,secret,secure=False):
     client = Minio(
         url,
         access_key=key,
@@ -75,7 +75,7 @@ def listFiles(bucket_name,url,key,secret,secure=False):
     except S3Error as err:
         print("error ",err)
 
-def cleanUp(url,key,secret,secure=False):
+def clean_up(url,key,secret,secure=False):
     client = Minio(
         url,
         access_key=key,
@@ -93,7 +93,7 @@ def cleanUp(url,key,secret,secure=False):
     except S3Error as err:
         print("error ",err)
 
-def createBucket(bucket_name,url,key,secret,secure=False):
+def create_bucket(bucket_name,url,key,secret,secure=False):
     client = Minio(
         url,
         access_key=key,

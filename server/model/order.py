@@ -2,14 +2,14 @@ from dataclasses import dataclass
 
 @dataclass
 class Order:
-    userid: str
-    appid: str
-    orderid: str
+    user_id: str
+    app_id: str
+    order_id: str
 
     @classmethod
     def from_dict(cls, data):
         return cls(
-            userid = data.get('userid'),
-            appid = data.get('appid'),
-            orderid = data.get('orderid')
+            user_id = data.get('user_id'),
+            app_id = data.get('app_id'),
+            order_id = data.get('order_id')
         )    

@@ -21,7 +21,7 @@ gemini_request_template = '''
     }
 '''
 
-def callGemini(prompt: str) -> str:
+def call_gemini(prompt: str) -> str:
     current_config = config['dev']
 
     final_prompt = gemini_request_template.replace("CONTENT_HERE",prompt)

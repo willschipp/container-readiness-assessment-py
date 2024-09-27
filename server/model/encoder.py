@@ -18,7 +18,7 @@ class Encoder(JSONEncoder):
     
 
 # helper function
-def loadPrompts(): # TODO have location passed as a variable
+def load_prompts(): # TODO have location passed as a variable
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(current_dir,'./prompts.json')
     with open(file_path,'r') as prompt_file:
