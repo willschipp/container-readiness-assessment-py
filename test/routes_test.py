@@ -1,10 +1,9 @@
 import unittest
 import json
-from flask import Flask, jsonify
-from flask.testing import FlaskClient
+from flask import Flask
 from server.handler.routes import main 
 from server.model.form import Form
-from server.model.form_encoder import FormEncoder
+from server.model.encoder import Encoder
 
 class TestSubmitFiles(unittest.TestCase):
     def setUp(self):
@@ -15,7 +14,7 @@ class TestSubmitFiles(unittest.TestCase):
     def test_submit_files_success(self):
         # Test successful JSON submission
         form = Form(userid="hello",appid="1234",applanguage="java",configtext="blah")
-        json_str = json.dumps(form,cls=FormEncoder)
+        json_str = json.dumps(form,cls=Encoder)
         headers = {"Content-type":"application/json"}
         response = self.client.post('/api/order', data=json_str,headers=headers)
         self.assertEqual(response.status_code, 200)

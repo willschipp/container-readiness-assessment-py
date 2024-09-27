@@ -3,7 +3,7 @@ import json
 
 from server.server import init_app
 from server.model.form import Form
-from server.model.form_encoder import FormEncoder
+from server.model.encoder import Encoder
 
 class TestServer(unittest.TestCase):
 
@@ -24,7 +24,7 @@ class TestServer(unittest.TestCase):
     def test_submit_files(self):
         form = Form(userid="userid",appid="blah",applanguage="java",configtext="other")
         response = self.client.post('/api/order',
-                                    data=json.dumps(form,cls=FormEncoder),
+                                    data=json.dumps(form,cls=Encoder),
                                     content_type='application/json')        
         self.assertEqual(response.status_code,200)
 

@@ -1,7 +1,7 @@
 import unittest
 import json
 
-from server.model.form_encoder import FormEncoder
+from server.model.encoder import Encoder, loadPrompts
 from server.model.form import Form
 
 class TestFormEncoder(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestFormEncoder(unittest.TestCase):
         # do something
         form = Form("user123","app123","java","some config text here")
         # serialize to json
-        json_str = json.dumps(form,cls=FormEncoder)
+        json_str = json.dumps(form,cls=Encoder)
         expected_json = {
             "userid":"user123",
             "appid":"app123",
@@ -18,6 +18,10 @@ class TestFormEncoder(unittest.TestCase):
             "configtext":"some config text here"
         }
         self.assertEqual(json.loads(json_str),expected_json)
+
+    def test_loadPrompts(self):
+        prompts = loadPrompts()
+        self.assertTrue(len(prompts) >= 4)
 
 
 

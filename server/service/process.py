@@ -8,11 +8,22 @@ import time
 
 from ..model.form import Form
 from ..model.job import Job
-from ..model.form_encoder import FormEncoder
+from ..model.encoder import Encoder, loadPrompts
 
 from ..service.s3 import save, listFiles, getBuckets, get
+from ..service.llm import callGemini
 
 from ..config import config
+
+# globals
+prompts = []
+
+def load():
+    global prompts
+    if len(prompts) <= 0:
+        print("prompts loaded")
+        prompts = loadPrompts()
+
 
 def createJob(form: Form) -> str:
     # create a job object
@@ -24,7 +35,7 @@ def createJob(form: Form) -> str:
     )
     # persist job object by writing it out to json
     with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        json_string = json.dumps(job,cls=FormEncoder)
+        json_string = json.dumps(job,cls=Encoder)
         temp_file.write(json_string)
         temp_file_path = temp_file.name
     
@@ -39,9 +50,25 @@ def createJob(form: Form) -> str:
     return orderid
 
 def isSelfContained(job: Job):
+    # load up the prompts
+    load()    
     # determine if the application is self-contained
     print("self contained ",job)
-    pass
+    # get the prompts
+    for p in prompts:
+        print(p)
+        if p.step == 0:
+            # use this one
+            prompt_string = p.prompt + ' ' + job.form.configtext # add a string gap            
+            break          
+
+    # send to the LLM
+    result = callGemini(prompt_string)
+    # now parse the string
+    # if it has 'yes' --> increment the step in the job to '1'
+    # if it doesn't --> increment the step to '5' (exit out)
+    # update the job outcome
+    return
 
 def createDockerfile(job: Job):
     # create a dockerfile for it
@@ -59,7 +86,17 @@ def createServiceYaml(job: Job):
     pass
 
 def noAction(job: Job):
-    pass
+    # create the "finished.json" file and write it back
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        temp_file.write('')
+        temp_file_path = temp_file.name
+    
+    # file is written --> save
+    current_config = config['dev']
+    save(temp_file_path,job.orderid,"finished.json",current_config.URL,current_config.KEY,current_config.SECRET)
+    # clean up the file
+    os.remove(temp_file_path)
+    return
 
 def processJob(job: Job):
     # retrieve the current step
@@ -102,13 +139,9 @@ def getActiveJobs():
             # process job
             processJob(job)        
 
-
 def backgroundProcess():
     while True:
-        # get all the buckets from s3
-        # for each bucket, check for "finished.json"
-        # if doesn't exist, retrieve the job.json
-        # pass it to processjob
+        # run
         getActiveJobs()
         # now pause
         time.sleep(5)
