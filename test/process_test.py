@@ -141,7 +141,50 @@ class TestProcess(unittest.TestCase):
     #             break
     #     self.assertTrue(has_file)
 
-    def test_step_create_dockerfile(self):
+    # def test_step_create_dockerfile(self):
+    #     current_dir = os.path.dirname(os.path.abspath(__file__))
+    #     file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+    #     # load up the file
+    #     with open(file_path,'r') as input:
+    #         content = input.read()
+
+    #     bucketname = str(uuid.uuid4()).replace('-','')
+    #     create_bucket(bucketname,self.url,self.key,self.secret)
+
+    #     form = Form(
+    #         user_id="jdoe",
+    #         app_id="1234",
+    #         app_language="java",
+    #         config_text=content
+    #     )    
+    #     # create job
+    #     job = Job(
+    #         order_id=bucketname,
+    #         current_step=1,
+    #         form=form
+    #     )     
+    #     step_create_dockerfile(job)     
+    #     # check if the file exists
+    #     has_file = False
+    #     files = list_files(bucketname,self.url,self.key,self.secret)
+    #     for file in files:
+    #         if file == "answer_1.json":
+    #             has_file = True
+    #             break
+    #     self.assertTrue(has_file)
+    #     #retrieve the file
+    #     with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+    #         pass
+    #     get_file(temp_file.name,bucketname,"answer_1.json",self.url,self.key,self.secret)
+    #     with open(temp_file.name,'r') as file:
+    #         content = file.read()
+    #     self.assertTrue(len(content) > 0)
+    #     print(content)
+
+    #     os.remove(temp_file.name)        
+        
+    def test_process_job_full(self):
+        # create a job and walk it through the steps 5 times
         current_dir = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
         # load up the file
@@ -160,10 +203,25 @@ class TestProcess(unittest.TestCase):
         # create job
         job = Job(
             order_id=bucketname,
-            current_step=1,
+            current_step=0,
             form=form
         )     
-        step_create_dockerfile(job)     
+        # iteration 0
+        process_job(job)
+        
+        # check for answer 0
+        # check if the file exists
+        has_file = False
+        files = list_files(bucketname,self.url,self.key,self.secret)
+        for file in files:
+            if file == "answer_0.json":
+                has_file = True
+                break
+        self.assertTrue(has_file)
+        # iteration 1
+        time.sleep(3)
+        process_job(job)
+        # check for answer 1
         # check if the file exists
         has_file = False
         files = list_files(bucketname,self.url,self.key,self.secret)
@@ -172,17 +230,41 @@ class TestProcess(unittest.TestCase):
                 has_file = True
                 break
         self.assertTrue(has_file)
-        #retrieve the file
-        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-            pass
-        get_file(temp_file.name,bucketname,"answer_1.json",self.url,self.key,self.secret)
-        with open(temp_file.name,'r') as file:
-            content = file.read()
-        self.assertTrue(len(content) > 0)
-        print(content)
+        # iteration 2
+        time.sleep(3)
+        process_job(job)
+        # check for answer 2
+        # check if the file exists
+        has_file = False
+        files = list_files(bucketname,self.url,self.key,self.secret)
+        for file in files:
+            if file == "answer_2.yaml":
+                has_file = True
+                break
+        self.assertTrue(has_file)
+        # iteration 3
+        time.sleep(3)
+        process_job(job)
+        # check for answer 3
+        # check if the file exists
+        has_file = False
+        files = list_files(bucketname,self.url,self.key,self.secret)
+        for file in files:
+            if file == "answer_3.yaml":
+                has_file = True
+                break
+        self.assertTrue(has_file)
+        # iteration 4
+        time.sleep(3)
+        process_job(job)
+        has_file = False
+        files = list_files(bucketname,self.url,self.key,self.secret)
+        for file in files:
+            if file == "finished.json":
+                has_file = True
+                break
+        self.assertTrue(has_file)
 
-        os.remove(temp_file.name)        
-        
 
 
 

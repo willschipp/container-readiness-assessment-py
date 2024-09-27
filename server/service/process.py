@@ -185,7 +185,7 @@ def step_create_deployment_yaml(job: Job):
 
 def step_create_service_yaml(job: Job):
     # create the service yaml for the application
-# load up the prompts
+    # load up the prompts
     load()    
     # determine if the application is self-contained
     logger.debug(f"service yaml creation {job}")
