@@ -103,7 +103,7 @@ def getActiveJobs():
             processJob(job)        
 
 
-def background_process():
+def backgroundProcess():
     while True:
         # get all the buckets from s3
         # for each bucket, check for "finished.json"
@@ -113,8 +113,8 @@ def background_process():
         # now pause
         time.sleep(5)
 
-def start_background():
-    bg_thread = threading.Thread(target=background_process)
+def startBackground():
+    bg_thread = threading.Thread(target=backgroundProcess)
     bg_thread.daemon = True
     bg_thread.start()
 

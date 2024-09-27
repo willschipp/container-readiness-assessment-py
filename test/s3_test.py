@@ -3,7 +3,7 @@ import os
 import tempfile
 import uuid
 
-from server.service.s3 import save, getBuckets, listFiles, get
+from server.service.s3 import save, getBuckets, listFiles, get, cleanUp, createBucket
 
 class TestS3(unittest.TestCase):
 
@@ -12,6 +12,9 @@ class TestS3(unittest.TestCase):
         self.url = "localhost:9000"
         self.key = "gjUHI2lScQ6JhwnbBkas"
 
+    def tearDown(self):
+        cleanUp(self.url,self.key,self.secret)
+
     def test_save(self):
         # bucketname = "testbucket"
         bucketname = str(uuid.uuid4()).replace('-','')
@@ -19,23 +22,31 @@ class TestS3(unittest.TestCase):
             temp_file.write('{"hello":"world"}')
             temp_file_path = temp_file.name
         
-        result = save(temp_file_path,bucketname,"test_obj",self.url,self.key,self.secret)
-        print("result ",result)
+        save(temp_file_path,bucketname,"test_obj",self.url,self.key,self.secret)
         os.remove(temp_file_path)
 
     def test_getBuckets(self):
+        bucketname = str(uuid.uuid4()).replace('-','')
+        createBucket(bucketname,self.url,self.key,self.secret)
+        # now search
         buckets = getBuckets(self.url,self.key,self.secret)
         self.assertTrue(len(buckets) > 0)
-        for bucket in buckets:
-            print(bucket)
 
     def test_listFiles(self):
+        #create content
+        bucketname = str(uuid.uuid4()).replace('-','')
+        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+            temp_file.write('{"hello":"world"}')
+            temp_file_path = temp_file.name
+        
+        save(temp_file_path,bucketname,"test_obj",self.url,self.key,self.secret)
+        os.remove(temp_file_path)
+        # validate method
         buckets = getBuckets(self.url,self.key,self.secret)
         self.assertTrue(len(buckets) > 0)
         for bucket in buckets:
             files = listFiles(bucket,self.url,self.key,self.secret)
-            for file in files:
-                print(file)
+            self.assertTrue(len(files) > 0)
 
     def test_get(self):
         # bucketname = "testbucket"
@@ -44,8 +55,7 @@ class TestS3(unittest.TestCase):
             temp_file.write('{"hello":"world"}')
             temp_file_path = temp_file.name
         
-        result = save(temp_file_path,bucketname,"test_obj",self.url,self.key,self.secret)
-        print("result ",result)
+        save(temp_file_path,bucketname,"test_obj",self.url,self.key,self.secret)
         os.remove(temp_file_path)
         # create a target temp file
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
@@ -54,9 +64,15 @@ class TestS3(unittest.TestCase):
         # now read the file
         with open(temp_file_path,'r') as file:
             content = file.read()
-        print(content)
+        self.assertTrue(len(content) > 0)
         os.remove(temp_file_path)
 
+
+    def test_cleanup(self):
+        # get all the buckets
+        # loop and get all the files
+        # delete all the files
+        cleanUp(self.url,self.key,self.secret)
 
         
 if __name__ == '__main__':

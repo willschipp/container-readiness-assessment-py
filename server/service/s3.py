@@ -73,4 +73,36 @@ def listFiles(bucket_name,url,key,secret,secure=False):
 
         return file_names
     except S3Error as err:
+        print("error ",err)
+
+def cleanUp(url,key,secret,secure=False):
+    client = Minio(
+        url,
+        access_key=key,
+        secret_key=secret,
+        secure=secure
+    )
+    try:
+        buckets = client.list_buckets()
+        # loop and turn into a list to return
+        for bucket in buckets:
+            files = client.list_objects(bucket.name,recursive=True)
+            for file in files:
+                client.remove_object(bucket.name,file.object_name)
+            client.remove_bucket(bucket.name)
+    except S3Error as err:
+        print("error ",err)
+
+def createBucket(bucket_name,url,key,secret,secure=False):
+    client = Minio(
+        url,
+        access_key=key,
+        secret_key=secret,
+        secure=secure
+    )
+
+    try:        
+        if not client.bucket_exists(bucket_name):            
+            client.make_bucket(bucket_name)
+    except S3Error as err:
         print("error ",err)            
