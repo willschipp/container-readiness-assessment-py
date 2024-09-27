@@ -8,17 +8,17 @@
         {
             "step":1,
             "appLanguage":"java",                        
-            "prompt":"Create a dockerfile for the following and use 'openjdk:24-ea-16-jdk-slim-bullseye' as the from image."
+            "prompt":"Create a dockerfile for the following and use 'openjdk:24-ea-16-jdk-slim-bullseye' as the from image, only include the dockerfile nothing else."
         },
         {
             "step":2,
             "appLanguage":"any",            
-            "prompt":"Create a kubernetes deployment.yaml for the following."
+            "prompt":"Create a kubernetes deployment.yaml for the following, only include the deployment.yaml output."
         },
         {
             "step":3,
             "appLanguage":"any",            
-            "prompt":"Create a kubernetes service.yaml using a LoadBalancer for the following."
+            "prompt":"Create a kubernetes service.yaml using a LoadBalancer for the following, only include the service.yaml output."
         }
     ]
 }

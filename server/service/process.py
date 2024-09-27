@@ -58,21 +58,20 @@ def step_is_self_contained(job: Job):
     # load up the prompts
     load()    
     # determine if the application is self-contained
-    logger.info(f"self contained {job}")
+    logger.debug(f"self contained {job}")
     # get the config text
     config_text = clean_string(job.form.config_text)
     # get the prompts
     for p in prompts:
         if p.step == 0:
             # use this one
-            # prompt_string = p.prompt + ' ' + job.form.configtext # add a string gap            
             prompt_string = p.prompt + ' ' + config_text # add a string gap            
             break          
 
     # send to the LLM
     result = call_gemini(prompt_string)
     # now parse the string
-    logger.info(f"result {result}")
+    logger.debug(f"result {result}")
     # parse into the response
     response = parse_json_to_gemini_response(result)
     answer = response.candidates[0].content.parts[0].text #location of the detailed response
@@ -107,18 +106,120 @@ def step_is_self_contained(job: Job):
 
 def step_create_dockerfile(job: Job):
     # create a dockerfile for it
-    print("self dockerfile ",job)
-    pass
+    #TODO include application logic choices
+    # load up the prompts
+    load()    
+    # determine if the application is self-contained
+    logger.debug(f"dockerfile creation {job}")
+    # get the config text
+    config_text = clean_string(job.form.config_text)
+    # get the prompts
+    for p in prompts:
+        if p.step == 1:
+            # use this one
+            prompt_string = p.prompt + ' ' + config_text # add a string gap            
+            break          
+
+    # send to the LLM
+    result = call_gemini(prompt_string)
+    # now parse the string
+    logger.debug(f"result {result}")
+    # save the answer
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        temp_file.write(result)
+        temp_file_path = temp_file.name    
+    # save
+    current_config = config['dev']                
+    save_file(temp_file_path,job.order_id,"answer_1.json",current_config.URL,current_config.KEY,current_config.SECRET)
+    # update the job to step 2
+    job.current_step = 2
+    # save the job
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        json_string = json.dumps(job,cls=Encoder)
+        temp_file.write(json_string)
+        temp_file_path = temp_file.name
+
+    save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+
+    logger.info(f"job {job.order_id} updated and saved")
+
+
 
 def step_create_deployment_yaml(job: Job):
     # create a deployment yaml for the application
-    print("self deployment ",job)
-    pass
+    # load up the prompts
+    load()    
+    # determine if the application is self-contained
+    logger.debug(f"deployment yaml creation {job}")
+    # get the config text
+    config_text = clean_string(job.form.config_text)
+    # get the prompts
+    for p in prompts:
+        if p.step == 2:
+            # use this one
+            prompt_string = p.prompt + ' ' + config_text # add a string gap            
+            break          
+
+    # send to the LLM
+    result = call_gemini(prompt_string)
+    # now parse the string
+    logger.debug(f"result {result}")
+    # save the answer
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        temp_file.write(result)
+        temp_file_path = temp_file.name    
+    # save
+    current_config = config['dev']                
+    save_file(temp_file_path,job.order_id,"answer_2.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
+    # update the job to step 3
+    job.current_step = 3
+    # save the job
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        json_string = json.dumps(job,cls=Encoder)
+        temp_file.write(json_string)
+        temp_file_path = temp_file.name
+
+    save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+
+    logger.info(f"job {job.order_id} updated and saved")
 
 def step_create_service_yaml(job: Job):
     # create the service yaml for the application
-    print("self service ",job)
-    pass
+# load up the prompts
+    load()    
+    # determine if the application is self-contained
+    logger.debug(f"service yaml creation {job}")
+    # get the config text
+    config_text = clean_string(job.form.config_text)
+    # get the prompts
+    for p in prompts:
+        if p.step == 3:
+            # use this one
+            prompt_string = p.prompt + ' ' + config_text # add a string gap            
+            break          
+
+    # send to the LLM
+    result = call_gemini(prompt_string)
+    # now parse the string
+    logger.debug(f"result {result}")
+    # save the answer
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        temp_file.write(result)
+        temp_file_path = temp_file.name    
+    # save
+    current_config = config['dev']                
+    save_file(temp_file_path,job.order_id,"answer_3.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
+    # update the job to step 4 (finished)
+    job.current_step = 4
+    # save the job
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        json_string = json.dumps(job,cls=Encoder)
+        temp_file.write(json_string)
+        temp_file_path = temp_file.name
+
+    save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+
+    logger.info(f"job {job.order_id} updated and saved")
 
 def step_finished_job(job: Job):
     # create the "finished.json" file and write it back

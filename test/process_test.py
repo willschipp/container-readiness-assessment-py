@@ -1,14 +1,15 @@
 import unittest
 
 import os
+import tempfile
 import threading
 import time
 import uuid
 
 from server.model.form import Form
 from server.model.job import Job
-from server.service.process import create_job, process_job, start_background, step_is_self_contained, step_finished_job
-from server.service.s3 import create_bucket, list_files, clean_up
+from server.service.process import create_job, process_job, start_background, step_is_self_contained, step_finished_job, step_create_dockerfile
+from server.service.s3 import create_bucket, list_files, clean_up, get_file
 
 class TestProcess(unittest.TestCase):
 
@@ -106,8 +107,41 @@ class TestProcess(unittest.TestCase):
     #             break
     #     self.assertTrue(has_file)
 
-    def test_step_is_self_contained(self):
-        #load up the sameple data 
+    # def test_step_is_self_contained(self):
+    #     #load up the sameple data 
+    #     current_dir = os.path.dirname(os.path.abspath(__file__))
+    #     file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+    #     # load up the file
+    #     with open(file_path,'r') as input:
+    #         content = input.read()
+
+    #     bucketname = str(uuid.uuid4()).replace('-','')
+    #     create_bucket(bucketname,self.url,self.key,self.secret)
+
+    #     form = Form(
+    #         user_id="jdoe",
+    #         app_id="1234",
+    #         app_language="java",
+    #         config_text=content
+    #     )    
+    #     # create job
+    #     job = Job(
+    #         order_id=bucketname,
+    #         current_step=0,
+    #         form=form
+    #     )            
+    #     # now invoke
+    #     step_is_self_contained(job)
+    #     # check if the file exists
+    #     has_file = False
+    #     files = list_files(bucketname,self.url,self.key,self.secret)
+    #     for file in files:
+    #         if file == "answer_0.json":
+    #             has_file = True
+    #             break
+    #     self.assertTrue(has_file)
+
+    def test_step_create_dockerfile(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
         # load up the file
@@ -126,19 +160,33 @@ class TestProcess(unittest.TestCase):
         # create job
         job = Job(
             order_id=bucketname,
-            current_step=0,
+            current_step=1,
             form=form
-        )            
-        # now invoke
-        step_is_self_contained(job)
+        )     
+        step_create_dockerfile(job)     
         # check if the file exists
         has_file = False
         files = list_files(bucketname,self.url,self.key,self.secret)
         for file in files:
-            if file == "answer_0.json":
+            if file == "answer_1.json":
                 has_file = True
                 break
         self.assertTrue(has_file)
+        #retrieve the file
+        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+            pass
+        get_file(temp_file.name,bucketname,"answer_1.json",self.url,self.key,self.secret)
+        with open(temp_file.name,'r') as file:
+            content = file.read()
+        self.assertTrue(len(content) > 0)
+        print(content)
+
+        os.remove(temp_file.name)        
+        
+
+
+
+
 
 #TODO create "opposite" of 'yes' parse
 
