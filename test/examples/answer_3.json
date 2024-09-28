@@ -1,0 +1,49 @@
+{
+    "candidates": [
+        {
+            "content": {
+                "parts": [
+                    {
+                        "text": "```yaml\napiVersion: v1\nkind: Service\nmetadata:\n  name: spring-boot-app\nspec:\n  type: LoadBalancer\n  selector:\n    app: spring-boot-app\n  ports:\n    - protocol: TCP\n      port: 8080\n      targetPort: 8080\n```"
+                    }
+                ],
+                "role": "model"
+            },
+            "finishReason": "STOP",
+            "index": 0,
+            "safetyRatings": [
+                {
+                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "probability": "NEGLIGIBLE"
+                },
+                {
+                    "category": "HARM_CATEGORY_HATE_SPEECH",
+                    "probability": "NEGLIGIBLE"
+                },
+                {
+                    "category": "HARM_CATEGORY_HARASSMENT",
+                    "probability": "NEGLIGIBLE"
+                },
+                {
+                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "probability": "NEGLIGIBLE"
+                }
+            ],
+            "citationMetadata": {
+                "citationSources": [
+                    {
+                        "startIndex": 37,
+                        "endIndex": 196,
+                        "uri": "https://github.com/lorenzolince/virtual-store",
+                        "license": ""
+                    }
+                ]
+            }
+        }
+    ],
+    "usageMetadata": {
+        "promptTokenCount": 200,
+        "candidatesTokenCount": 76,
+        "totalTokenCount": 276
+    }
+}

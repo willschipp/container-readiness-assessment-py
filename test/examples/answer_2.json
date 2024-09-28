@@ -1,0 +1,61 @@
+{
+    "candidates": [
+        {
+            "content": {
+                "parts": [
+                    {
+                        "text": "```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: spring-boot-app\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: spring-boot-app\n  template:\n    metadata:\n      labels:\n        app: spring-boot-app\n    spec:\n      containers:\n      - name: spring-boot-app\n        image: your-docker-registry/spring-boot-app:latest\n        ports:\n        - containerPort: 8080\n        resources:\n          requests:\n            cpu: \"500m\"\n            memory: \"512Mi\"\n          limits:\n            cpu: \"1\"\n            memory: \"1Gi\"\n        env:\n        - name: SPRING_PROFILES_ACTIVE\n          value: \"prod\"\n        livenessProbe:\n          tcpSocket:\n            port: 8080\n          initialDelaySeconds: 15\n          periodSeconds: 20\n        readinessProbe:\n          tcpSocket:\n            port: 8080\n          initialDelaySeconds: 5\n          periodSeconds: 10\n```"
+                    }
+                ],
+                "role": "model"
+            },
+            "finishReason": "STOP",
+            "index": 0,
+            "safetyRatings": [
+                {
+                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    "probability": "NEGLIGIBLE"
+                },
+                {
+                    "category": "HARM_CATEGORY_HATE_SPEECH",
+                    "probability": "NEGLIGIBLE"
+                },
+                {
+                    "category": "HARM_CATEGORY_HARASSMENT",
+                    "probability": "NEGLIGIBLE"
+                },
+                {
+                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    "probability": "NEGLIGIBLE"
+                }
+            ],
+            "citationMetadata": {
+                "citationSources": [
+                    {
+                        "startIndex": 8,
+                        "endIndex": 297,
+                        "uri": "https://blog.csdn.net/qq_43546721/article/details/133759964",
+                        "license": ""
+                    },
+                    {
+                        "startIndex": 626,
+                        "endIndex": 836,
+                        "uri": "https://github.com/Mielkeway/microsoft-aks-days",
+                        "license": ""
+                    },
+                    {
+                        "startIndex": 651,
+                        "endIndex": 871,
+                        "uri": "https://github.com/omerlin/win10_kub_benchmark",
+                        "license": ""
+                    }
+                ]
+            }
+        }
+    ],
+    "usageMetadata": {
+        "promptTokenCount": 196,
+        "candidatesTokenCount": 267,
+        "totalTokenCount": 463
+    }
+}

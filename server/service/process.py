@@ -13,6 +13,7 @@ from ..model.encoder import Encoder, load_prompts
 
 from ..service.s3 import save_file, list_files, get_buckets, get_file
 from ..service.llm import call_gemini, clean_string
+from ..service.file_formatter import convert_to_dockerfile, convert_to_yaml
 
 from ..config import config
 from ..logging_config import setup_logging
@@ -131,6 +132,15 @@ def step_create_dockerfile(job: Job):
     # save
     current_config = config['dev']                
     save_file(temp_file_path,job.order_id,"answer_1.json",current_config.URL,current_config.KEY,current_config.SECRET)
+    # get the answer and write it out as a docker file
+    response = parse_json_to_gemini_response(result)
+    answer = response.candidates[0].content.parts[0].text 
+    docker_file = convert_to_dockerfile(answer)
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        temp_file.write(docker_file)
+        temp_file_path = temp_file.name    
+    # save        
+    save_file(temp_file_path,job.order_id,"Dockerfile",current_config.URL,current_config.KEY,current_config.SECRET)
     # update the job to step 2
     job.current_step = 2
     # save the job
@@ -171,6 +181,16 @@ def step_create_deployment_yaml(job: Job):
     # save
     current_config = config['dev']                
     save_file(temp_file_path,job.order_id,"answer_2.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
+
+    response = parse_json_to_gemini_response(result)
+    answer = response.candidates[0].content.parts[0].text 
+    deployment_yaml = convert_to_yaml(answer)
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        temp_file.write(deployment_yaml)
+        temp_file_path = temp_file.name    
+    # save        
+    save_file(temp_file_path,job.order_id,"deployment.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
+
     # update the job to step 3
     job.current_step = 3
     # save the job
@@ -209,6 +229,17 @@ def step_create_service_yaml(job: Job):
     # save
     current_config = config['dev']                
     save_file(temp_file_path,job.order_id,"answer_3.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
+
+    response = parse_json_to_gemini_response(result)
+    answer = response.candidates[0].content.parts[0].text 
+    service_yaml = convert_to_yaml(answer)
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        temp_file.write(service_yaml)
+        temp_file_path = temp_file.name    
+    # save        
+    save_file(temp_file_path,job.order_id,"service.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
+
+
     # update the job to step 4 (finished)
     job.current_step = 4
     # save the job
@@ -285,6 +316,8 @@ def background_process():
         find_active_jobs()
         # now pause
         time.sleep(5)
+
+#TODO handle exception in threads
 
 def start_background():
     bg_thread = threading.Thread(target=background_process)
