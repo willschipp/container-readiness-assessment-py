@@ -29,6 +29,21 @@ def load():
         logger.info("prompts loaded")
         prompts = load_prompts()
 
+def save_string(content: str,bucket_name: str,obj_name: str):
+    # persist job object by writing it out to json
+    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+        temp_file.write(content)
+        temp_file_path = temp_file.name
+
+    # file is written --> save
+    current_config = config['dev']
+
+    save_file(temp_file_path,bucket_name,obj_name,current_config.URL,current_config.KEY,current_config.SECRET)
+
+    logger.info(f"file {obj_name} saved")
+    # clean up the file
+    os.remove(temp_file_path)
+
 
 def create_job(form: Form) -> str:
     # create a job object
@@ -39,20 +54,12 @@ def create_job(form: Form) -> str:
         form=form
     )
     # persist job object by writing it out to json
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        json_string = json.dumps(job,cls=Encoder)
-        temp_file.write(json_string)
-        temp_file_path = temp_file.name
-    
-    # file is written --> save
-    current_config = config['dev']
-
-    save_file(temp_file_path,order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
-
+    json_string = json.dumps(job,cls=Encoder)
+    # save it
+    save_string(json_string,order_id,"job.json")
+    # log
     logger.info(f"job {job.order_id} created and saved")
-    # clean up the file
-    os.remove(temp_file_path)
-
+    # return
     return order_id
 
 def step_is_self_contained(job: Job):
@@ -70,40 +77,34 @@ def step_is_self_contained(job: Job):
             break          
 
     # send to the LLM
-    result = call_gemini(prompt_string)
-    # now parse the string
-    logger.debug(f"result {result}")
-    # parse into the response
-    response = parse_json_to_gemini_response(result)
-    answer = response.candidates[0].content.parts[0].text #location of the detailed response
-    # if it has 'yes' --> increment the step in the job to '1'
-    if 'yes'.lower() in answer.lower():
-        # save the answer
-        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-            temp_file.write(result)
-            temp_file_path = temp_file.name    
-        # save
-        current_config = config['dev']                
-        save_file(temp_file_path,job.order_id,"answer_0.json",current_config.URL,current_config.KEY,current_config.SECRET)
-        # update the job to step 1
-        job.current_step = 1
-        # save the job
-        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
+    try:
+        result = call_gemini(prompt_string)
+        # now parse the string
+        logger.debug(f"result {result}")
+        # parse into the response
+        response = parse_json_to_gemini_response(result)
+        answer = response.candidates[0].content.parts[0].text #location of the detailed response
+        # if it has 'yes' --> increment the step in the job to '1'
+        if 'yes'.lower() in answer.lower():
+            # save the answer           
+            save_string(result,job.order_id,"answer_0.json")
+            # update the job to step 1
+            job.current_step = 1
+            # save the job
             json_string = json.dumps(job,cls=Encoder)
-            temp_file.write(json_string)
-            temp_file_path = temp_file.name
-
-        save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
-
-        logger.info(f"job {job.order_id} updated and saved")
-    else:
-        logger.info("Not able to containerize")
-        logger.debug(f"response {answer} for {job}")
-        step_finished_job(job)
-        pass
-    # if it doesn't --> increment the step to '5' (exit out)
-    # update the job outcome
-    return
+            save_string(json_string,job.order_id,"job.json")
+            # log it
+            logger.info(f"job {job.order_id} updated and saved")
+        else:
+            # if it doesn't --> increment the step to '5' (exit out)
+            # update the job outcome
+            logger.info("Not able to containerize")
+            logger.debug(f"response {answer} for {job}")
+            step_finished_job(job)
+        return
+    except Exception as err:
+        logger.error(f"error occurred - halted {err}")
+        return
 
 def step_create_dockerfile(job: Job):
     # create a dockerfile for it
@@ -126,33 +127,19 @@ def step_create_dockerfile(job: Job):
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        temp_file.write(result)
-        temp_file_path = temp_file.name    
-    # save
-    current_config = config['dev']                
-    save_file(temp_file_path,job.order_id,"answer_1.json",current_config.URL,current_config.KEY,current_config.SECRET)
+    save_string(result,job.order_id,"answer_1.json")
     # get the answer and write it out as a docker file
     response = parse_json_to_gemini_response(result)
     answer = response.candidates[0].content.parts[0].text 
     docker_file = convert_to_dockerfile(answer)
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        temp_file.write(docker_file)
-        temp_file_path = temp_file.name    
-    # save        
-    save_file(temp_file_path,job.order_id,"Dockerfile",current_config.URL,current_config.KEY,current_config.SECRET)
+    save_string(docker_file,job.order_id,"Dockerfile")
     # update the job to step 2
     job.current_step = 2
     # save the job
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        json_string = json.dumps(job,cls=Encoder)
-        temp_file.write(json_string)
-        temp_file_path = temp_file.name
-
-    save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
-
+    json_string = json.dumps(job,cls=Encoder)
+    save_string(json_string,job.order_id,"job.json")
+    # log it
     logger.info(f"job {job.order_id} updated and saved")
-
 
 
 def step_create_deployment_yaml(job: Job):
@@ -175,31 +162,17 @@ def step_create_deployment_yaml(job: Job):
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        temp_file.write(result)
-        temp_file_path = temp_file.name    
-    # save
-    current_config = config['dev']                
-    save_file(temp_file_path,job.order_id,"answer_2.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
+    save_string(result,job.order_id,"answer_2.json")
 
     response = parse_json_to_gemini_response(result)
     answer = response.candidates[0].content.parts[0].text 
     deployment_yaml = convert_to_yaml(answer)
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        temp_file.write(deployment_yaml)
-        temp_file_path = temp_file.name    
-    # save        
-    save_file(temp_file_path,job.order_id,"deployment.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
-
+    save_string(deployment_yaml,job.order_id,"deployment.yaml")
     # update the job to step 3
     job.current_step = 3
     # save the job
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        json_string = json.dumps(job,cls=Encoder)
-        temp_file.write(json_string)
-        temp_file_path = temp_file.name
-
-    save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+    json_string = json.dumps(job,cls=Encoder)
+    save_string(json_string,job.order_id,"job.json")
 
     logger.info(f"job {job.order_id} updated and saved")
 
@@ -223,32 +196,18 @@ def step_create_service_yaml(job: Job):
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        temp_file.write(result)
-        temp_file_path = temp_file.name    
-    # save
-    current_config = config['dev']                
-    save_file(temp_file_path,job.order_id,"answer_3.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
+    save_string(result,job.order_id,"answer_3.json")
 
     response = parse_json_to_gemini_response(result)
     answer = response.candidates[0].content.parts[0].text 
     service_yaml = convert_to_yaml(answer)
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        temp_file.write(service_yaml)
-        temp_file_path = temp_file.name    
-    # save        
-    save_file(temp_file_path,job.order_id,"service.yaml",current_config.URL,current_config.KEY,current_config.SECRET)
-
+    save_string(service_yaml,job.order_id,"service.yaml")
 
     # update the job to step 4 (finished)
     job.current_step = 4
     # save the job
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        json_string = json.dumps(job,cls=Encoder)
-        temp_file.write(json_string)
-        temp_file_path = temp_file.name
-
-    save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+    json_string = json.dumps(job,cls=Encoder)
+    save_string(json_string,job.order_id,"job.json")
 
     logger.info(f"job {job.order_id} updated and saved")
     # directly invoke close out
@@ -256,15 +215,7 @@ def step_create_service_yaml(job: Job):
 
 def step_finished_job(job: Job):
     # create the "finished.json" file and write it back
-    with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-        temp_file.write('')
-        temp_file_path = temp_file.name
-    
-    # file is written --> save
-    current_config = config['dev']
-    save_file(temp_file_path,job.order_id,"finished.json",current_config.URL,current_config.KEY,current_config.SECRET)
-    # clean up the file
-    os.remove(temp_file_path)
+    save_string("",job.order_id,"finished.json")
 
     logger.info(f"job {job.order_id} finished")
     return

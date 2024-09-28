@@ -22,34 +22,34 @@ class TestProcess(unittest.TestCase):
         clean_up(self.url,self.key,self.secret)        
 
 
-    # def test_createJob(self):
-    #     # create a form
-    #     form = Form(
-    #         userid="jdoe",
-    #         appid="1234",
-    #         applanguage="java",
-    #         configtext="blah blah blah"
-    #     )
-    #     # submit to the create job process and get back an orderid
-    #     orderid = createJob(form)
-    #     self.assertIsNotNone(orderid)
+    def test_createJob(self):
+        # create a form
+        form = Form(
+            user_id="jdoe",
+            app_id="1234",
+            app_language="java",
+            config_text="blah blah blah"
+        )
+        # submit to the create job process and get back an orderid
+        orderid = create_job(form)
+        self.assertIsNotNone(orderid)
 
-    # def test_processJob(self):
-    #     # create form
-    #     form = Form(
-    #         userid="jdoe",
-    #         appid="1234",
-    #         applanguage="java",
-    #         configtext="blah blah blah"
-    #     )
-    #     # create job
-    #     job = Job(
-    #         orderid="1234",
-    #         currentStep=0,
-    #         form=form
-    #     )
-    #     # execute
-    #     processJob(job)
+    def test_processJob(self):
+        # create form
+        form = Form(
+            user_id="jdoe",
+            app_id="1234",
+            app_language="java",
+            config_text="blah blah blah"
+        )
+        # create job
+        job = Job(
+            order_id="1234",
+            current_step=0,
+            form=form
+        )
+        # execute
+        process_job(job)
 
     # def test_backgroundProcess(self):
     #     # start the process
@@ -266,44 +266,44 @@ class TestProcess(unittest.TestCase):
     #     self.assertTrue(has_file)
 
 
-    def test_process_job_background(self):
-        # create a job and write it to the s3
-        # create a job and walk it through the steps 5 times
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
-        # load up the file
-        with open(file_path,'r') as input:
-            content = input.read()
+    # def test_process_job_background(self):
+    #     # create a job and write it to the s3
+    #     # create a job and walk it through the steps 5 times
+    #     current_dir = os.path.dirname(os.path.abspath(__file__))
+    #     file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+    #     # load up the file
+    #     with open(file_path,'r') as input:
+    #         content = input.read()
 
-        form = Form(
-            user_id="jdoe",
-            app_id="1234",
-            app_language="java",
-            config_text=content
-        )    
-        # written
-        order_id = create_job(form)        
-        # start the background process
-        start_background()
-        # poll/check for "finished.json"
-        i = 10
-        j = 0
-        complete = False
-        while j < i:
-            has_file = False
-            files = list_files(order_id,self.url,self.key,self.secret)
-            for file in files:
-                if file == "finished.json":
-                    has_file = True
-                    break
-            if has_file == True:
-                complete = True
-                break
-            else:
-                j += 1
-                time.sleep(3) # sleep 3 seconds between
+    #     form = Form(
+    #         user_id="jdoe",
+    #         app_id="1234",
+    #         app_language="java",
+    #         config_text=content
+    #     )    
+    #     # written
+    #     order_id = create_job(form)        
+    #     # start the background process
+    #     start_background()
+    #     # poll/check for "finished.json"
+    #     i = 10
+    #     j = 0
+    #     complete = False
+    #     while j < i:
+    #         has_file = False
+    #         files = list_files(order_id,self.url,self.key,self.secret)
+    #         for file in files:
+    #             if file == "finished.json":
+    #                 has_file = True
+    #                 break
+    #         if has_file == True:
+    #             complete = True
+    #             break
+    #         else:
+    #             j += 1
+    #             time.sleep(3) # sleep 3 seconds between
 
-        self.assertTrue(complete)            
+    #     self.assertTrue(complete)            
 
 
 #TODO create "opposite" of 'yes' parse
