@@ -5,25 +5,23 @@ import os
 from ..logging_config import setup_logging
 
 from ..model.form import Form
-from ..model.order import Order
+from ..model.prompt import Prompt
+from ..model.encoder import load_prompts
 
 from ..service.process import create_job
 from ..service.order_management import get_job_by_order_id
 
 logger = setup_logging()
 
+prompts = []
+
 main = Blueprint('main',__name__)
 
-@main.route('/')
-def home():
-    logger.info("returning index")
-    return render_template('index.html')
-
-@main.route('/static/<path:filename>')
-def serve_static(filename):
-    logger.info("returning static")
-    root_dir = os.path.dirname(os.getcwd())
-    return send_from_directory(os.path.join(root_dir,'static'),"index.html")    
+def load():
+    global prompts
+    if len(prompts) <= 0:
+        logger.info("prompts loaded")
+        prompts = load_prompts()
 
 @main.route('/api/order',methods=['POST'])
 def submit_files():
@@ -56,5 +54,23 @@ def get_order(order_id):
     logger.info("get order")
     order = get_job_by_order_id(order_id)
     return jsonify(order),200
+
+
+@main.route('/api/languages',methods=['GET'])
+def get_languages():
+    logger.info("getting languages")
+    #load the prompts
+    load()
+    # get all the app languages
+    app_languages = []
+    for p in prompts:
+        if p.app_language not in app_languages:
+            if p.app_language != 'any': # ignore 'any' --> keyword
+                app_languages.append(p.app_language)
+    
+    return jsonify({
+        "languages":app_languages
+    }),200
+
 
     

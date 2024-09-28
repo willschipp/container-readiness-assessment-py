@@ -3,3 +3,4 @@ __pycache__
 key.md
 data/
 *.sh
+node_modules
