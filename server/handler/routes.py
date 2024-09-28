@@ -5,8 +5,10 @@ import os
 from ..logging_config import setup_logging
 
 from ..model.form import Form
+from ..model.order import Order
 
 from ..service.process import create_job
+from ..service.order_management import get_job_by_order_id
 
 logger = setup_logging()
 
@@ -48,3 +50,11 @@ def submit_files():
         return jsonify({
             "error":"parsing json"
         }), 400
+    
+@main.route('/api/order/<order_id>',methods=['GET'])
+def get_order(order_id):
+    logger.info("get order")
+    order = get_job_by_order_id(order_id)
+    return jsonify(order),200
+
+    

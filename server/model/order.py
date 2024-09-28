@@ -1,10 +1,16 @@
 from dataclasses import dataclass
+from typing import List
+
+from .job import Job
 
 @dataclass
 class Order:
     user_id: str
     app_id: str
     order_id: str
+    job: Job
+    files: List[str]
+    finished: bool
 
     @classmethod
     def from_dict(cls, data):
