@@ -220,6 +220,8 @@ def step_create_service_yaml(job: Job):
     save_file(temp_file_path,job.order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
 
     logger.info(f"job {job.order_id} updated and saved")
+    # directly invoke close out
+    step_finished_job(job)
 
 def step_finished_job(job: Job):
     # create the "finished.json" file and write it back
@@ -232,6 +234,8 @@ def step_finished_job(job: Job):
     save_file(temp_file_path,job.order_id,"finished.json",current_config.URL,current_config.KEY,current_config.SECRET)
     # clean up the file
     os.remove(temp_file_path)
+
+    logger.info(f"job {job.order_id} finished")
     return
 
 def process_job(job: Job):

@@ -13,5 +13,5 @@ class Job:
         return cls(
             order_id = data.get('order_id'),
             current_step = data.get('current_step'),
-            form = data.get('form')
+            form = Form.from_dict(data.get('form'))
         )

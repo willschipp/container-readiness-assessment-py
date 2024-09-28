@@ -1,0 +1,10 @@
+{
+    "order_id": "8dc78f14b8944967be161e87777f5149",
+    "current_step": 0,
+    "form": {
+        "user_id": "jdoe",
+        "app_id": "1234",
+        "app_language": "java",
+        "config_text": "plugins {\n    id 'org.springframework.boot' version '3.1.4'\n    id 'io.spring.dependency-management' version '1.1.3'\n    id 'java'\n}\n\ngroup = 'com.example'\nversion = '0.0.1-SNAPSHOT'\nsourceCompatibility = '17'\n\nrepositories {\n    mavenCentral()\n}\n\ndependencies {\n    implementation 'org.springframework.boot:spring-boot-starter-web'\n    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'\n    runtimeOnly 'com.h2database:h2'\n    testImplementation 'org.springframework.boot:spring-boot-starter-test'\n}\n\ntasks.named('test') {\n    useJUnitPlatform()\n}"
+    }
+}

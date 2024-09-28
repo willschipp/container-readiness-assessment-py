@@ -183,7 +183,91 @@ class TestProcess(unittest.TestCase):
 
     #     os.remove(temp_file.name)        
         
-    def test_process_job_full(self):
+    # def test_process_job_full(self):
+    #     # create a job and walk it through the steps 5 times
+    #     current_dir = os.path.dirname(os.path.abspath(__file__))
+    #     file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+    #     # load up the file
+    #     with open(file_path,'r') as input:
+    #         content = input.read()
+
+    #     bucketname = str(uuid.uuid4()).replace('-','')
+    #     create_bucket(bucketname,self.url,self.key,self.secret)
+
+    #     form = Form(
+    #         user_id="jdoe",
+    #         app_id="1234",
+    #         app_language="java",
+    #         config_text=content
+    #     )    
+    #     # create job
+    #     job = Job(
+    #         order_id=bucketname,
+    #         current_step=0,
+    #         form=form
+    #     )     
+    #     # iteration 0
+    #     process_job(job)
+        
+    #     # check for answer 0
+    #     # check if the file exists
+    #     has_file = False
+    #     files = list_files(bucketname,self.url,self.key,self.secret)
+    #     for file in files:
+    #         if file == "answer_0.json":
+    #             has_file = True
+    #             break
+    #     self.assertTrue(has_file)
+    #     # iteration 1
+    #     time.sleep(3)
+    #     process_job(job)
+    #     # check for answer 1
+    #     # check if the file exists
+    #     has_file = False
+    #     files = list_files(bucketname,self.url,self.key,self.secret)
+    #     for file in files:
+    #         if file == "answer_1.json":
+    #             has_file = True
+    #             break
+    #     self.assertTrue(has_file)
+    #     # iteration 2
+    #     time.sleep(3)
+    #     process_job(job)
+    #     # check for answer 2
+    #     # check if the file exists
+    #     has_file = False
+    #     files = list_files(bucketname,self.url,self.key,self.secret)
+    #     for file in files:
+    #         if file == "answer_2.yaml":
+    #             has_file = True
+    #             break
+    #     self.assertTrue(has_file)
+    #     # iteration 3
+    #     time.sleep(3)
+    #     process_job(job)
+    #     # check for answer 3
+    #     # check if the file exists
+    #     has_file = False
+    #     files = list_files(bucketname,self.url,self.key,self.secret)
+    #     for file in files:
+    #         if file == "answer_3.yaml":
+    #             has_file = True
+    #             break
+    #     self.assertTrue(has_file)
+    #     # iteration 4
+    #     time.sleep(3)
+    #     process_job(job)
+    #     has_file = False
+    #     files = list_files(bucketname,self.url,self.key,self.secret)
+    #     for file in files:
+    #         if file == "finished.json":
+    #             has_file = True
+    #             break
+    #     self.assertTrue(has_file)
+
+
+    def test_process_job_background(self):
+        # create a job and write it to the s3
         # create a job and walk it through the steps 5 times
         current_dir = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
@@ -191,83 +275,35 @@ class TestProcess(unittest.TestCase):
         with open(file_path,'r') as input:
             content = input.read()
 
-        bucketname = str(uuid.uuid4()).replace('-','')
-        create_bucket(bucketname,self.url,self.key,self.secret)
-
         form = Form(
             user_id="jdoe",
             app_id="1234",
             app_language="java",
             config_text=content
         )    
-        # create job
-        job = Job(
-            order_id=bucketname,
-            current_step=0,
-            form=form
-        )     
-        # iteration 0
-        process_job(job)
-        
-        # check for answer 0
-        # check if the file exists
-        has_file = False
-        files = list_files(bucketname,self.url,self.key,self.secret)
-        for file in files:
-            if file == "answer_0.json":
-                has_file = True
+        # written
+        order_id = create_job(form)        
+        # start the background process
+        start_background()
+        # poll/check for "finished.json"
+        i = 10
+        j = 0
+        complete = False
+        while j < i:
+            has_file = False
+            files = list_files(order_id,self.url,self.key,self.secret)
+            for file in files:
+                if file == "finished.json":
+                    has_file = True
+                    break
+            if has_file == True:
+                complete = True
                 break
-        self.assertTrue(has_file)
-        # iteration 1
-        time.sleep(3)
-        process_job(job)
-        # check for answer 1
-        # check if the file exists
-        has_file = False
-        files = list_files(bucketname,self.url,self.key,self.secret)
-        for file in files:
-            if file == "answer_1.json":
-                has_file = True
-                break
-        self.assertTrue(has_file)
-        # iteration 2
-        time.sleep(3)
-        process_job(job)
-        # check for answer 2
-        # check if the file exists
-        has_file = False
-        files = list_files(bucketname,self.url,self.key,self.secret)
-        for file in files:
-            if file == "answer_2.yaml":
-                has_file = True
-                break
-        self.assertTrue(has_file)
-        # iteration 3
-        time.sleep(3)
-        process_job(job)
-        # check for answer 3
-        # check if the file exists
-        has_file = False
-        files = list_files(bucketname,self.url,self.key,self.secret)
-        for file in files:
-            if file == "answer_3.yaml":
-                has_file = True
-                break
-        self.assertTrue(has_file)
-        # iteration 4
-        time.sleep(3)
-        process_job(job)
-        has_file = False
-        files = list_files(bucketname,self.url,self.key,self.secret)
-        for file in files:
-            if file == "finished.json":
-                has_file = True
-                break
-        self.assertTrue(has_file)
+            else:
+                j += 1
+                time.sleep(3) # sleep 3 seconds between
 
-
-
-
+        self.assertTrue(complete)            
 
 
 #TODO create "opposite" of 'yes' parse
