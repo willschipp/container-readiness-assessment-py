@@ -8,7 +8,7 @@ function Menu() {
 
     const handleNavigation = (selected) => {
         var selection = [...selected][0];
-        if (selection == 'newRequest') {
+        if (selection === 'newRequest') {
             navigate('/form');
         } else {
             navigate('/existing');

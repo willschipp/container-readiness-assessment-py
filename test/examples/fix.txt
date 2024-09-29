@@ -1,0 +1,20 @@
+INFO:container-readiness-assessment-platform:file answer_1.json saved
+Exception in thread Thread-1:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 926, in _bootstrap_inner
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 870, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/will/Documents/GitHub/container-readiness-assessment-py/server/service/process.py", line 267, in background_process
+    find_active_jobs()
+  File "/Users/will/Documents/GitHub/container-readiness-assessment-py/server/service/process.py", line 262, in find_active_jobs
+    process_job(job)
+  File "/Users/will/Documents/GitHub/container-readiness-assessment-py/server/service/process.py", line 232, in process_job
+    return switcher.get(currentStep,step_finished_job)(job)
+  File "/Users/will/Documents/GitHub/container-readiness-assessment-py/server/service/process.py", line 132, in step_create_dockerfile
+    response = parse_json_to_gemini_response(result)
+  File "/Users/will/Documents/GitHub/container-readiness-assessment-py/server/model/response.py", line 30, in parse_json_to_gemini_response
+    parts = [Part(text=part['text']) for part in candidate_data['content'].get('parts', [])]
+KeyError: 'content'
+
+2024-09-28 18:58:06,478 - container-readiness-assessment-platform - INFO - get order
