@@ -7,6 +7,7 @@ import RequestForm from './components/RequestForm';
 import Home from './components/Home';
 import Menu from './components/Menu';
 import Existing from './components/Existing';
+import Order from './components/Order';
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
                   <Route path="/" element={<Home/>}/>
                   <Route path="/form" element={<RequestForm/>}/>
                   <Route path="/existing" element={<Existing/>}/>
+                  <Route path="/order" element={<Order/>}/>
                 </Routes>
           
               

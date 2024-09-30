@@ -1,6 +1,4 @@
 from flask import Blueprint, send_from_directory, render_template, request, jsonify
-import logging
-import os
 
 from ..logging_config import setup_logging
 
