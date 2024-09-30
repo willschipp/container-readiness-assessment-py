@@ -8,7 +8,7 @@ from ..model.job import Job
 from ..model.form import Form
 from ..model.encoder import Encoder
 
-from ..service.s3 import list_files, get_file
+from ..service.s3 import list_files, get_file, get_buckets
 
 from ..config import config
 from ..logging_config import setup_logging
@@ -66,3 +66,15 @@ def get_job_by_order_id(order_id):
     os.remove(temp_file.name)
     
     return order
+
+def get_all_orders():
+    orders = []
+    # setup access
+    current_config = config['dev']
+    bucket_names = get_buckets(current_config.URL,current_config.KEY,current_config.SECRET)
+    for bucket_name in bucket_names:
+        # have the order id --> for each bucket need to get the job.json
+        order = get_job_by_order_id(bucket_name)
+        orders.append(order)
+    
+    return orders

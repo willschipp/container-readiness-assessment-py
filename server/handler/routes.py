@@ -1,13 +1,16 @@
-from flask import Blueprint, send_from_directory, render_template, request, jsonify
+from flask import Blueprint, send_file, request, jsonify
+import tempfile
+import os
 
 from ..logging_config import setup_logging
+from ..config import config
 
 from ..model.form import Form
-from ..model.prompt import Prompt
 from ..model.encoder import load_prompts
 
 from ..service.process import create_job
-from ..service.order_management import get_job_by_order_id
+from ..service.order_management import get_job_by_order_id, get_all_orders
+from ..service.s3 import get_file
 
 logger = setup_logging()
 
@@ -46,7 +49,13 @@ def submit_files():
         return jsonify({
             "error":"parsing json"
         }), 400
-    
+
+@main.route('/api/order',methods=['GET'])
+def get_orders():
+    logger.info("getting all orders")
+    orders = get_all_orders()
+    return jsonify(orders),200
+
 @main.route('/api/order/<order_id>',methods=['GET'])
 def get_order(order_id):
     logger.info("get order")
@@ -69,6 +78,25 @@ def get_languages():
     return jsonify({
         "languages":app_languages
     }),200
+
+
+@main.route('/api/download/<order_id>/<file_id>',methods=['GET'])
+def download_file(order_id,file_id):
+    try:
+        # setup the temporary file
+        # download from s3
+        # stream back
+        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".tmp") as temp_file:
+            pass
+        current_config = config['dev']
+        get_file(temp_file.name,order_id,file_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        # serve
+        return send_file(temp_file.name,as_attachment=True,download_name=file_id)
+        # TODO clean up
+    except Exception as err:
+        return jsonify({
+            "error":err
+        }),500
 
 
     
