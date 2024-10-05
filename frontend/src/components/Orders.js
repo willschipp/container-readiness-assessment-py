@@ -35,8 +35,8 @@ function Orders() {
     },[]);    
 
     return (
-        <Content>
-            <TableView aria-label="Order" width="calc(100% - size-1000)">
+        <Content width="calc(100% - size-1000)">
+            <TableView aria-label="Order">
                 <TableHeader>
                     <Column allowsResizing>Order ID</Column>
                     <Column>App ID</Column>

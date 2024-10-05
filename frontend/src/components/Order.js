@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button, ButtonGroup, Text, View } from '@adobe/react-spectrum';
+import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button, ButtonGroup, Text, Well } from '@adobe/react-spectrum';
+import Back from '@spectrum-icons/workflow/Back';
 import Download from '@spectrum-icons/workflow/Download';
 
 function Order() {
@@ -36,10 +37,14 @@ function Order() {
         navigate('/files', { state: { orderId: orderId }});
     }
 
+    const handleBack = (e) => {
+        navigate('/orders')
+    }
+
     return (
 
-        <Content>
-            <TableView aria-label="Order" width="calc(100% - size-1000)">
+        <Content width="calc(100% - size-1000)">
+            <TableView aria-label="Order">
                 <TableHeader>
                     <Column>Order ID</Column>
                     <Column>{data.order_id}</Column>
@@ -63,14 +68,18 @@ function Order() {
                     </Row>
                 </TableBody>
             </TableView>
-            <View>
+            <Well>
                 <ButtonGroup>
                     <Button variant="primary" onPress={handleFiles}>
                         <Download/>
                         <Text>Download Files</Text>
+                    </Button>
+                    <Button variant="secondary" onPress={handleBack}>
+                        <Back/>
+                        <Text>Back</Text>
                     </Button>                
                 </ButtonGroup>
-            </View>
+            </Well>
         </Content>
     )
 }
