@@ -35,11 +35,10 @@ function Orders() {
     },[]);    
 
     return (
-        <div>
-            <Content>Orders</Content>
-            <TableView aria-label="Order">
+        <Content>
+            <TableView aria-label="Order" width="calc(100% - size-1000)">
                 <TableHeader>
-                    <Column>Order ID</Column>
+                    <Column allowsResizing>Order ID</Column>
                     <Column>App ID</Column>
                     <Column>User ID</Column>
                     <Column>Language</Column>
@@ -63,7 +62,7 @@ function Orders() {
                     ))}
                 </TableBody>
             </TableView>
-        </div>
+        </Content>
     )
 }
 

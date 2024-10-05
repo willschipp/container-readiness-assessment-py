@@ -1,7 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// import { Label, TextField, , } from 'react-aria-components';
-import { Grid, View , defaultTheme, Provider, Content, Header, Footer, Heading, Button } from '@adobe/react-spectrum';
+import { Grid, View , defaultTheme, Provider, Content } from '@adobe/react-spectrum';
+
+
+import AppHeader from './components/AppHeader';
+import AppFooter from './components/AppFooter';
+
 
 import RequestForm from './components/RequestForm';
 import Home from './components/Home';
@@ -21,11 +25,10 @@ function App() {
           columns={['1fr','3fr']} 
           rows={['size-1000','auto','size-1000']} 
           height="100vh" 
-          gap="size-100">
+          gap="size-100"
+          justifyContent="center">
           <View gridArea="header">
-            <Header>
-              <Heading level={2}>Container Readiness Assessment Platform</Heading>
-            </Header>
+            <AppHeader/>
           </View>
           <View gridArea="sidebar">
             <Menu/>
@@ -40,13 +43,12 @@ function App() {
                   <Route path="/order" element={<Order/>}/>
                   <Route path="/orders" element={<Orders/>}/>
                   <Route path="/files" element={<Files/>}/>
-                </Routes>
-          
+                </Routes>          
               
             </Content>
           </View>
           <View gridArea="footer">
-            <Footer>v0.0.1</Footer>
+            <AppFooter/>
           </View>
         </Grid>
       </Router>    
@@ -55,16 +57,3 @@ function App() {
 }
 
 export default App;
-
-
-{/* <Form onSubmit={handleSubmit} maxWidth="size-5000">
-<TextField label="Application ID"/>
-<TextField label="User ID"/>
-<Picker label="Choose application language">
-  { data.map(item => (
-    <Item key={item}>{item}</Item>
-  ))}
-</Picker>
-<TextArea label="Copy & Paste your build file here" minWidth="size-3600" isRequired={true}/>
-<Button variant="accent" type="submit" maxWidth="size-1000">Submit</Button>
-</Form> */}

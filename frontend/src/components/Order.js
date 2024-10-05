@@ -14,7 +14,7 @@ function Order() {
 
     useEffect(() => {
         fetchData();
-    },[]);
+    });
 
     const fetchData = async () => {
         try {
@@ -32,16 +32,14 @@ function Order() {
     }
 
     const handleFiles = (e) => {
-        // get the order id
         // navigate
         navigate('/files', { state: { orderId: orderId }});
     }
 
     return (
 
-        <div>
-            <Content>Order</Content>
-            <TableView aria-label="Order">
+        <Content>
+            <TableView aria-label="Order" width="calc(100% - size-1000)">
                 <TableHeader>
                     <Column>Order ID</Column>
                     <Column>{data.order_id}</Column>
@@ -73,7 +71,7 @@ function Order() {
                     </Button>                
                 </ButtonGroup>
             </View>
-        </div>
+        </Content>
     )
 }
 

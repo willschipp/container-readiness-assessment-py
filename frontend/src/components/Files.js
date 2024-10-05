@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button, ButtonGroup, Text, View } from '@adobe/react-spectrum';
+import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button } from '@adobe/react-spectrum';
 import Download from '@spectrum-icons/workflow/Download';
 
 function Files() {
@@ -54,14 +54,11 @@ function Files() {
 
     useEffect(() => {
         fetchData();
-    },[]);
+    });
 
     return (
-        <div>
-           <Content>
-                Files
-            </Content>
-            <TableView>
+        <Content>                        
+            <TableView width="calc(100% - size-1000)">
                 <TableHeader>
                     <Column>Order ID</Column>
                     <Column>{orderId}</Column>
@@ -81,7 +78,7 @@ function Files() {
                     ))}
                 </TableBody>
             </TableView>
-        </div>
+        </Content>
     )
 }
 
