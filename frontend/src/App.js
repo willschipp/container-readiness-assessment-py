@@ -8,6 +8,8 @@ import Home from './components/Home';
 import Menu from './components/Menu';
 import Existing from './components/Existing';
 import Order from './components/Order';
+import Orders from './components/Orders';
+import Files from './components/Files';
 
 function App() {
 
@@ -36,6 +38,8 @@ function App() {
                   <Route path="/form" element={<RequestForm/>}/>
                   <Route path="/existing" element={<Existing/>}/>
                   <Route path="/order" element={<Order/>}/>
+                  <Route path="/orders" element={<Orders/>}/>
+                  <Route path="/files" element={<Files/>}/>
                 </Routes>
           
               

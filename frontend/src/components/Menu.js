@@ -10,10 +10,11 @@ function Menu() {
         var selection = [...selected][0];
         if (selection === 'newRequest') {
             navigate('/form');
+        } else if (selection === 'allOrders') {
+            navigate('/orders');
         } else {
             navigate('/existing');
         }
-        // navigate('/form'); //nothing to pass
     }
 
     return (
@@ -25,6 +26,7 @@ function Menu() {
                 onSelectionChange={handleNavigation}>
                 <Item key="newRequest">Create a New Request</Item>
                 <Item key="existingRequest">View an existing Request</Item>
+                <Item key="allOrders">View All Orders</Item>
             </ListBox>
         </div>
     )

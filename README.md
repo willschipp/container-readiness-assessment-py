@@ -1,4 +1,9 @@
 
+### Front end
+1. `rm -rf node_modules`
+2. `npm i`
+3. `npm run start` --> dev server
+
 ### LLM
 
 Gemini API key

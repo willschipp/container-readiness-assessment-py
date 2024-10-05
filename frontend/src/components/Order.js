@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Content, TableView, Column, Row, TableHeader, Cell, TableBody } from '@adobe/react-spectrum';
+import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button, ButtonGroup, Text, View } from '@adobe/react-spectrum';
+import Download from '@spectrum-icons/workflow/Download';
 
 function Order() {
     const location = useLocation();
@@ -9,6 +10,7 @@ function Order() {
     const [data, setData] = useState([]);
     let result = '';
 
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchData();
@@ -29,6 +31,12 @@ function Order() {
         }
     }
 
+    const handleFiles = (e) => {
+        // get the order id
+        // navigate
+        navigate('/files', { state: { orderId: orderId }});
+    }
+
     return (
 
         <div>
@@ -36,21 +44,35 @@ function Order() {
             <TableView aria-label="Order">
                 <TableHeader>
                     <Column>Order ID</Column>
-                    <Column>App ID</Column>
-                    <Column>User ID</Column>
-                    <Column>Language</Column>
-                    <Column>Status</Column>
+                    <Column>{data.order_id}</Column>
                 </TableHeader>
                 <TableBody>
                     <Row>
-                        <Cell>{data.order_id}</Cell>
+                        <Cell>App Id</Cell>
                         <Cell>{data.app_id}</Cell>
+                    </Row>
+                    <Row>
+                        <Cell>User ID</Cell>
                         <Cell>{data.user_id}</Cell>
-                        <Cell>{data.job.form.app_language}</Cell>
+                    </Row>
+                    <Row>
+                        <Cell>App Language</Cell>
+                        <Cell>{data.job ? data.job.form.app_language : ''}</Cell>
+                    </Row>
+                    <Row>
+                        <Cell>Status</Cell>
                         <Cell>{data.finished === true ? (<span>Finished</span>) : (<span>Running</span>)}</Cell>
                     </Row>
                 </TableBody>
             </TableView>
+            <View>
+                <ButtonGroup>
+                    <Button variant="primary" onPress={handleFiles}>
+                        <Download/>
+                        <Text>Download Files</Text>
+                    </Button>                
+                </ButtonGroup>
+            </View>
         </div>
     )
 }

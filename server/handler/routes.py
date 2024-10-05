@@ -10,7 +10,7 @@ from ..model.encoder import load_prompts
 
 from ..service.process import create_job
 from ..service.order_management import get_job_by_order_id, get_all_orders
-from ..service.s3 import get_file
+from ..service.s3 import get_file, list_files
 
 logger = setup_logging()
 
@@ -78,6 +78,22 @@ def get_languages():
     return jsonify({
         "languages":app_languages
     }),200
+
+
+@main.route('/api/order/<order_id>/files',methods=['GET'])
+def get_files_list(order_id):
+    try :
+        current_config = config['dev']
+        files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        response = []
+        for file in files:
+            if '.json' not in file:
+                response.append(file)
+        return jsonify(response),200
+    except Exception as err:
+        return jsonify({
+            "error":err
+        }),500
 
 
 @main.route('/api/download/<order_id>/<file_id>',methods=['GET'])
