@@ -15,7 +15,7 @@ function Order() {
 
     useEffect(() => {
         fetchData();
-    });
+    },[]);
 
     const fetchData = async () => {
         try {

@@ -1,5 +1,6 @@
 from flask import Blueprint, send_file, request, jsonify
 import tempfile
+import json
 
 from ..logging_config import setup_logging
 from ..config import config
@@ -94,7 +95,7 @@ def get_files_list(order_id):
             "error":err
         }),500
     
-@main.route('/api/order/<order_id>/answers',methods=['GET'])
+@main.route('/api/order/<order_id>/answer',methods=['GET'])
 def get_answers(order_id):
     try :
         current_config = config['dev']
@@ -108,6 +109,22 @@ def get_answers(order_id):
         return jsonify({
             "error":err
         }),500    
+
+@main.route('/api/order/<order_id>/answer/<file_name>',methods=['GET'])
+def get_answer(order_id,file_name):
+    # get the explicit file, read it and stream the response to the browser
+    try:
+        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".tmp") as temp_file:
+            pass
+        current_config = config['dev']
+        get_file(temp_file.name,order_id,file_name,current_config.URL,current_config.KEY,current_config.SECRET)
+        with open(temp_file.name,'r') as answer_file:
+            data = json.load(answer_file)            
+        return jsonify(data),200    
+    except Exception as err:
+        return jsonify({
+            "error":err
+        }),500
 
 
 @main.route('/api/download/<order_id>/<file_id>',methods=['GET'])

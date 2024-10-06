@@ -2,20 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button } from '@adobe/react-spectrum';
-import Download from '@spectrum-icons/workflow/Download';
+import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button, View, Text } from '@adobe/react-spectrum';
+import ViewDetail from '@spectrum-icons/workflow/ViewDetail';
 
 function Answers() {
 
     const location = useLocation();
     const orderId = location.state?.orderId;
     const [data, setData] = useState([]);
+    const [details, setDetails] = useState([]);
     let result = '';
 
     const fetchData = async () => {
         try {
             //use the order id to retrieve
-            const response = await fetch('/api/order/' + orderId.trim() + '/answers');
+            const response = await fetch('/api/order/' + orderId.trim() + '/answer');
             if (!response.ok) {
                 throw new Error(`http error! status: ${response.status}`);
             }
@@ -29,24 +30,13 @@ function Answers() {
 
     const handleDownload = async (orderId,filename) => {
         try {
-            const response = await axios.get('/api/download/' + orderId + '/' + filename, {
-                responseType:'blob',
-            });
-
-            const blob = new Blob([response.data],{ type: response.headers['content-type']});
-
-            const url = window.URL.createObjectURL(blob);
-
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download',filename);
-
-            document.body.appendChild(link);
-            link.click();
-
-            //clean up
-            link.parentNode.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            const response = await fetch('/api/order/' + orderId + '/answer/' + filename);
+            if (!response.ok) {
+                throw new Error(`http error! status: ${response.status}`);
+            }
+            result = await response.json();
+            setDetails(result);
+            console.log(result);
         } catch (error) {
             console.error(error);
         }
@@ -54,7 +44,7 @@ function Answers() {
 
     useEffect(() => {
         fetchData();
-    });
+    },[]);
 
     return (
         <Content>                        
@@ -71,13 +61,16 @@ function Answers() {
                             </Cell>
                             <Cell>
                                 <Button onPress={() => handleDownload(orderId,item)}>
-                                    <Download/>
+                                    <ViewDetail/>
                                 </Button>
                             </Cell>
                         </Row>
                     ))}
                 </TableBody>
-            </TableView>            
+            </TableView>
+            <View>
+                <Text>{JSON.stringify(details,null,2)}</Text>
+            </View>            
         </Content>
     )
 }
