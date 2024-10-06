@@ -2,7 +2,7 @@ import unittest
 import os
 import json
 
-from server.service.llm import call_gemini, escape_other_for_json, escape_xml_for_json, clean_string
+from server.service.llm import call_gemini, call_ollama, escape_other_for_json, escape_xml_for_json, clean_string
 
 class TestProcess(unittest.TestCase):
 
@@ -12,6 +12,22 @@ class TestProcess(unittest.TestCase):
     # def test_callGemini(self):
     #     result = callGemini("why is the sky blue?")
     #     print(result)
+
+    def test_call_ollama(self):
+        # build the prompt
+        prompt = "Analyze the following and answer only yes or no if the build file describes an application that could run on kubernetes."
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+        # load up the file
+        with open(file_path,'r') as input:
+            content = input.read()
+        escaped_code = escape_other_for_json(content)
+        # build the prompt
+        prompt += " "
+        prompt += escaped_code
+        response = call_ollama(prompt)
+        self.assertIsNotNone(response)
+
 
     def test_escape_gradle_for_json(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))

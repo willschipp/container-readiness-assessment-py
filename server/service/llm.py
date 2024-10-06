@@ -26,6 +26,15 @@ gemini_request_template = '''
     }
 '''
 
+ollama_request_template = '''
+    {
+        "model":"codellama:latest",
+        "prompt":"CONTENT_HERE",
+        "format":"json",
+        "stream":false
+    }
+'''
+
 def call_gemini(prompt: str) -> str:
     current_config = config['dev']
 
@@ -33,7 +42,7 @@ def call_gemini(prompt: str) -> str:
     url = current_config.LLM_URL
     url = url.replace("API_KEY",current_config.LLM_KEY)
 
-    logging.debug(final_prompt)
+    logging.info(final_prompt)        
 
     try:
         headers = {"Content-type":"application/json"}
@@ -45,6 +54,27 @@ def call_gemini(prompt: str) -> str:
     except requests.exceptions.RequestException as err:
         logging.error(f"an error occurred: {err}")
         return None
+
+
+def call_ollama(prompt: str) -> str:
+    current_config = config['ollama']
+
+    final_prompt = ollama_request_template.replace("CONTENT_HERE",prompt)
+    url = current_config.LLM_URL
+    
+    logging.error(final_prompt)
+
+    try:
+        headers = {"Content-type":"application/json"}
+        response = requests.post(url,data=final_prompt,headers=headers)
+        # process response body into the json object
+        response.raise_for_status()
+        response_string = json.dumps(response.json())
+        return response_string
+    except requests.exceptions.RequestException as err:
+        logging.error(f"an error occurred: {err}")
+        return None
+    
 
 
 def escape_xml_for_json(xml_string):
