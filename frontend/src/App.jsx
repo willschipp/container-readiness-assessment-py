@@ -14,6 +14,7 @@ import Existing from './components/Existing';
 import Order from './components/Order';
 import Orders from './components/Orders';
 import Files from './components/Files';
+import Answers from './components/Answers';
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
                   <Route path="/order" element={<Order/>}/>
                   <Route path="/orders" element={<Orders/>}/>
                   <Route path="/files" element={<Files/>}/>
+                  <Route path="/answers" element={<Answers/>}/>
                 </Routes>          
               
             </Content>

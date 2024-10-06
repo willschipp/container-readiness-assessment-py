@@ -37,6 +37,11 @@ function Order() {
         navigate('/files', { state: { orderId: orderId }});
     }
 
+    const handleAnswers = (e) => {
+        // navigate
+        navigate('/answers', { state: { orderId: orderId }});
+    }    
+
     const handleBack = (e) => {
         navigate('/orders')
     }
@@ -74,6 +79,10 @@ function Order() {
                         <Download/>
                         <Text>Download Files</Text>
                     </Button>
+                    <Button variant="secondary" onPress={handleAnswers}>
+                        <Download/>
+                        <Text>View Answers</Text>
+                    </Button>                    
                     <Button variant="secondary" onPress={handleBack}>
                         <Back/>
                         <Text>Back</Text>
