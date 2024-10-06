@@ -1,4 +1,4 @@
-from json import JSONEncoder, load
+from json import JSONEncoder, load, dumps
 import os
 
 
@@ -30,4 +30,20 @@ def load_prompts(): # TODO have location passed as a variable
         prompt = Prompt.from_dict(obj)
         prompts.append(prompt)
     return prompts
+
+   
+def class_to_json(obj):
+    def serialize(val):
+        if isinstance(val, (int, float, str, bool, type(None))):
+            return val
+        elif isinstance(val, (list, tuple)):
+            return [serialize(item) for item in val]
+        elif isinstance(val, dict):
+            return {str(k): serialize(v) for k, v in val.items()}
+        elif hasattr(val, '__dict__'):
+            return serialize(val.__dict__)
+        else:
+            return str(val)
     
+    serialized_dict = serialize(obj.__dict__)
+    return dumps(serialized_dict, indent=2)    

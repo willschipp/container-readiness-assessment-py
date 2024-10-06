@@ -8,7 +8,7 @@ import uuid
 
 from ..model.form import Form
 from ..model.job import Job
-from ..model.response import GeminiResponse, parse_json_to_gemini_response
+from ..model.response import parse_json_to_gemini_response
 from ..model.encoder import Encoder, load_prompts
 
 from ..service.s3 import save_file, list_files, get_buckets, get_file

@@ -1,6 +1,5 @@
 from flask import Blueprint, send_file, request, jsonify
 import tempfile
-import os
 
 from ..logging_config import setup_logging
 from ..config import config
@@ -94,6 +93,21 @@ def get_files_list(order_id):
         return jsonify({
             "error":err
         }),500
+    
+@main.route('/api/order/<order_id>/answers',methods=['GET'])
+def get_answers(order_id):
+    try :
+        current_config = config['dev']
+        files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        response = []
+        for file in files:
+            if 'answer' in file:
+                response.append(file)
+        return jsonify(response),200
+    except Exception as err:
+        return jsonify({
+            "error":err
+        }),500    
 
 
 @main.route('/api/download/<order_id>/<file_id>',methods=['GET'])
