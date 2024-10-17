@@ -3,21 +3,16 @@ FROM node:18 as build
 
 WORKDIR /app
 
-COPY frontend/package.json ./
-
-RUN npm install
-
 COPY frontend/* .
 
-RUN npm run build
-
+RUN npm install && npm run build
 
 # Runtime
 FROM python:3.9-slim as runtime
 
 WORKDIR /app
 
-COPY --from=build frontend/build frontend/build
+COPY --from=build build frontend/build
 
 COPY requirements.txt .
 
