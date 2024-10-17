@@ -1,34 +1,32 @@
 # Build
-FROM node:18 as build
+FROM node:slim as build
 
 WORKDIR /app
 
-COPY frontend/package.json ./
+COPY frontend/. ./
 
-RUN npm install
-
-COPY frontend/* .
-
-RUN npm run build
-
+# install and build
+RUN npm install && npm run build
 
 # Runtime
 FROM python:3.9-slim as runtime
 
 WORKDIR /app
 
-COPY --from=build frontend/build frontend/build
+RUN mkdir /app/frontend
+
+COPY --from=build /app/build /app/frontend/build/.
 
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY server .
+RUN mkdir /app/server
 
-# COPY frontend/build .
+COPY server /app/server/.
 
 # set env variables
-ENV FLASK_APP=server/server.py
+ENV FLASK_APP=/app/server/server.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_CONFIG=default
 
