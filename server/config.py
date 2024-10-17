@@ -26,8 +26,16 @@ class OllamaConfig(Config):
     LLM_URL = os.getenv("OLLAMA_URL","http://localhost:11434/api/generate")
     LLM_KEY = ""
 
+class LlamaCPPConfig(Config):
+    URL = os.getenv("S3_URL","localhost:9000")
+    KEY = "gjUHI2lScQ6JhwnbBkas"
+    SECRET = os.getenv("SECRET")
+    LLM_URL = os.getenv("LLAMACPP_URL","http://localhost:8080/completion")
+    LLM_KEY = ""    
+
 
 config = {
     'dev': DevConfig,
     'ollama': OllamaConfig,
+    'llamacpp': LlamaCPPConfig
 }
