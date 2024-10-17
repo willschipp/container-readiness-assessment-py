@@ -12,7 +12,7 @@ class Config:
         pass
 
 class DevConfig(Config):
-    URL = "localhost:9000"
+    URL = os.getenv("S3_URL","localhost:9000")
     KEY = "gjUHI2lScQ6JhwnbBkas"
     SECRET = os.getenv("SECRET")
     LLM_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=API_KEY"
@@ -20,10 +20,10 @@ class DevConfig(Config):
 
 
 class OllamaConfig(Config):
-    URL = "localhost:9000"
+    URL = os.getenv("S3_URL","localhost:9000")
     KEY = "gjUHI2lScQ6JhwnbBkas"
     SECRET = os.getenv("SECRET")
-    LLM_URL = "http://localhost:11434/api/generate"
+    LLM_URL = os.getenv("OLLAMA_URL","http://localhost:11434/api/generate")
     LLM_KEY = ""
 
 
