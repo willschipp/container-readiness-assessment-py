@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container-readiness-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: container-readiness-app
+  template:
+    metadata:
+      labels:
+        app: container-readiness-app
+    spec:
+      containers:
+      - name: container-readiness-app
+        image: quay.io/w_schipp/kcrap:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: SECRET
+          value: <s3 secret>
+        - name: LLM_KEY
+          value: <llm_key>
+        - name: S3_URL
+          value: <s3_url>        
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
