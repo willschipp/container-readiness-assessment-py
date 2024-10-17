@@ -6,6 +6,7 @@ WORKDIR /app
 COPY frontend/. ./
 
 # install and build
+
 RUN npm install && npm run build
 
 # Runtime
