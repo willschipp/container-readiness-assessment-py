@@ -1,0 +1,11 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: custom-model
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: custom-format
+      storageUri: gs://vllm_test_models/Mistral-7B-Instruct-v0.3
+      runtime: llamacpp
