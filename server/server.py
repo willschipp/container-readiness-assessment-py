@@ -20,9 +20,9 @@ app = init_app(os.getenv('FLASK_CONFIG') or 'default')
 # star the processing
 start_background()
 
-@app.route('/')
-def index():
-    return app.send_static_file('index.html')
+# @app.route('/')
+# def index():
+#     return app.send_static_file('index.html')
 
 if __name__ == "__main__":
     logger.info("starting...")    

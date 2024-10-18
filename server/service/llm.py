@@ -1,6 +1,7 @@
 import json
 import logging
 import requests
+import os
 
 
 import xml.etree.ElementTree as Element
@@ -41,8 +42,16 @@ llamacpp_request_template = '''
     }
 '''
 
+def call_llm(prompt: str,name: str) -> str:
+    if name == "llamacpp":
+        return call_llamacpp(prompt)
+    elif name == "ollama":
+        return call_ollama(prompt)
+    else:
+        return call_gemini(prompt) #default operation
+
 def call_gemini(prompt: str) -> str:
-    current_config = config['dev']
+    current_config = config[os.getenv('RUN_MODE','dev')]
 
     final_prompt = gemini_request_template.replace("CONTENT_HERE",prompt)
     url = current_config.LLM_URL
@@ -63,12 +72,12 @@ def call_gemini(prompt: str) -> str:
 
 
 def call_ollama(prompt: str) -> str:
-    current_config = config['ollama']
+    current_config = config[os.getenv('RUN_MODE','ollama')]
 
     final_prompt = ollama_request_template.replace("CONTENT_HERE",prompt)
     url = current_config.LLM_URL
     
-    logging.error(final_prompt)
+    logging.debug(final_prompt)
 
     try:
         headers = {"Content-type":"application/json"}
@@ -83,12 +92,12 @@ def call_ollama(prompt: str) -> str:
     
 
 def call_llamacpp(prompt: str) -> str:
-    current_config = config['llamacpp']
+    current_config = config[os.getenv('RUN_MODE','llamacpp')]
 
     final_prompt = llamacpp_request_template.replace("CONTENT_HERE",prompt)
     url = current_config.LLM_URL
     
-    logging.error(final_prompt)
+    logging.debug(final_prompt)
 
     try:
         headers = {"Content-type":"application/json"}
