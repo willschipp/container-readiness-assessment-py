@@ -79,9 +79,10 @@ def get_all_orders():
     for bucket_name in bucket_names:
         # have the order id --> for each bucket need to get the job.json
         order = get_job_by_order_id(bucket_name)
-        if order is Not None:
-            orders.append(order)
-        else:
+        if order is None:
             logger.info("none response")
+        else:
+            orders.append(order)
+            
     
     return orders
