@@ -104,10 +104,10 @@ def step_is_self_contained(job: Job):
         # response = parse_json_to_gemini_response(result)
         # answer = response.candidates[0].content.parts[0].text #location of the detailed response
         answer = parse_response(result)
+        # save the answer
+        save_string(result,job.order_id,"answer_0.json")
         # if it has 'yes' --> increment the step in the job to '1'
         if 'yes'.lower() in answer.lower():
-            # save the answer           
-            save_string(result,job.order_id,"answer_0.json")
             # update the job to step 1
             job.current_step = 1
             # save the job
