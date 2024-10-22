@@ -57,8 +57,12 @@ def get_job_by_order_id(order_id):
         pass
     get_file(temp_file.name,order_id,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
     # read into json
-    with open(temp_file.name,'r') as job_file:
-        data = json.load(job_file)
+    try:
+        with open(temp_file.name,'r') as job_file:
+            data = json.load(job_file)
+    catch Exception as e:
+        logger.error(f"error parsing json {e}")
+        return None
     order.job = Job.from_dict(data)
     order.user_id = order.job.form.user_id
     order.app_id = order.job.form.app_id
@@ -75,6 +79,9 @@ def get_all_orders():
     for bucket_name in bucket_names:
         # have the order id --> for each bucket need to get the job.json
         order = get_job_by_order_id(bucket_name)
-        orders.append(order)
+        if order is Not None:
+            orders.append(order)
+        else:
+            logger.info("none response")
     
     return orders

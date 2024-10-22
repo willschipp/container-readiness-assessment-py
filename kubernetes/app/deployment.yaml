@@ -27,7 +27,9 @@ spec:
         - name: KEY
           value: UMBCY9pH5Cra5YNDHOgR
         - name: LLAMACPP_URL
-          value: http://10.110.9.236/completion      
+          value: http://10.110.9.236/completion 
+        - name: RUN_MODE
+          value: llamacpp     
         resources:
           requests:
             cpu: 100m
@@ -35,3 +37,4 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
+        imagePullPolicy: Always
