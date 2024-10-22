@@ -60,7 +60,7 @@ def get_job_by_order_id(order_id):
     try:
         with open(temp_file.name,'r') as job_file:
             data = json.load(job_file)
-    catch Exception as e:
+    except Exception as e:
         logger.error(f"error parsing json {e}")
         return None
     order.job = Job.from_dict(data)
