@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: container-readiness-app
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: container-readiness-app
@@ -19,11 +19,15 @@ spec:
         - containerPort: 5000
         env:
         - name: SECRET
-          value: <s3 secret>
+          value: T7vQKTUk4SCPHyxNBQPjmktJAHW0zUGHmxmLLiss
         - name: LLM_KEY
-          value: <llm_key>
+          value: none
         - name: S3_URL
-          value: <s3_url>        
+          value: 10.97.111.36:9000
+        - name: KEY
+          value: UMBCY9pH5Cra5YNDHOgR
+        - name: LLAMACPP_URL
+          value: http://10.110.9.236/completion      
         resources:
           requests:
             cpu: 100m
