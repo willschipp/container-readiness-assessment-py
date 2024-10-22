@@ -75,6 +75,8 @@ def create_job(form: Form) -> str:
     save_string(json_string,order_id,"job.json")
     # log
     logger.info(f"job {job.order_id} created and saved")
+    # start thread
+    start_background()    
     # return
     return order_id
 
@@ -292,8 +294,13 @@ def background_process():
 #TODO handle exception in threads
 
 def start_background():
-    bg_thread = threading.Thread(target=background_process)
-    bg_thread.daemon = True
-    bg_thread.start()
+    for th in threading.enumerate():
+        if th.name == "processing_thread":
+            logger.info("thread still running")
+            break
+    else:
+        bg_thread = threading.Thread(target=background_process,name="processing_thread")
+        bg_thread.daemon = True
+        bg_thread.start()
 
 

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useNavigate } from 'react-router-dom';
 import { Form, TextArea, Button, Picker, Item, TextField  } from '@adobe/react-spectrum';
 
 function RequestForm() {
@@ -8,6 +9,8 @@ function RequestForm() {
     const [app_id,setAppId] = React.useState(null);
     const [user_id,setUserId] = React.useState(null);
     const [config_text,setConfigText] = React.useState(null);
+
+    const navigate = useNavigate();    
   
     const fetchData = async () => {
       try {
@@ -45,7 +48,7 @@ function RequestForm() {
         ),
       }).then((response) => {
         console.log('Sent')
-        console.log(response.json);
+        navigate('/orders');
       }).catch((error) => {
         console.error(error);
       });
