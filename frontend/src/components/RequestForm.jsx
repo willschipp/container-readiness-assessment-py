@@ -28,19 +28,24 @@ function RequestForm() {
       e.preventDefault();
       console.log("invoked")
       // build a 'form'
-      let requestForm = {
-        user_id: user_id,
-        app_id: app_id,
-        app_language: language,
-        config_text: config_text
-      }
+      let requestForm = 
       // submit it (POST) and get the response
       fetch('/api/order',{
         method:'POST',
-        body: requestForm,
+        headers: {
+          'Content-type':'application/json'
+        },
+        body: JSON.stringify(
+          {
+            user_id: user_id,
+            app_id: app_id,
+            app_language: language,
+            config_text: config_text
+          }
+        ),
       }).then((response) => {
         console.log('Sent')
-        console.log(response.body);
+        console.log(response.json);
       }).catch((error) => {
         console.error(error);
       });
