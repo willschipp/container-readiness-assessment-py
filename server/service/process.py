@@ -35,14 +35,17 @@ def load():
         llm_name = os.getenv('RUN_MODE','dev')
 
 def parse_response(reply: str):
-    if llm_name != "dev":
-        # parse 'content'
-        data = json.loads(reply)
-        return data.get("content",None)
-    else:
+    if llm_name == "ollama":
+        data - json.loads(reply)
+        return data.get("response",None)
+    elif llm_name == "dev":
         # parse gemini
         response = parse_json_to_gemini_response(reply)
         return response.candidates[0].content.parts[0].text #location of the detailed response
+    else:
+        # parse 'content'
+        data = json.loads(reply)
+        return data.get("content",None)
 
 
 def save_string(content: str,bucket_name: str,obj_name: str):
