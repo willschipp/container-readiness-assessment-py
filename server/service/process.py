@@ -36,7 +36,7 @@ def load():
 
 def parse_response(reply: str):
     if llm_name == "ollama":
-        data - json.loads(reply)
+        data = json.loads(reply)
         return data.get("response",None)
     elif llm_name == "dev":
         # parse gemini
