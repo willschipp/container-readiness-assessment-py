@@ -20,7 +20,8 @@ class Encoder(JSONEncoder):
 # helper function
 def load_prompts(): # TODO have location passed as a variable
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir,'./prompts.json')
+    # file_path = os.path.join(current_dir,'./prompts.json')
+    file_path = os.path.join(current_dir,'./prompts_codellama.json')
     with open(file_path,'r') as prompt_file:
         data = load(prompt_file)
 

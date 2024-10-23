@@ -12,7 +12,8 @@ def convert_to_yaml(yaml_string) -> str:
 
 def convert_to_dockerfile(dockerfile_string) -> str:
     # scrub
-    dockerfile_string = dockerfile_string.strip().replace("```dockerfile","").replace("```","")
+    # dockerfile_string = dockerfile_string.strip().replace("```dockerfile","").replace("```","")
+    dockerfile_string = dockerfile_string.strip().split("```")[1] #return the code after the backtick block
     # split into lines
     lines = dockerfile_string.strip().split('\\n')
     # build

@@ -1,0 +1,10 @@
+{
+    "response":"
+    Here is a generated Dockerfile using the provided build file and 'openjdk...'
+    ```
+    FROM ...
+    COPY ...
+    ENTRYPOINT
+    ```
+    "
+}
