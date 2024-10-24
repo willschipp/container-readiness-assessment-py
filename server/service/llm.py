@@ -77,7 +77,7 @@ def call_ollama(prompt: str) -> str:
     final_prompt = ollama_request_template.replace("CONTENT_HERE",prompt)
     url = current_config.LLM_URL
     
-    logging.debug(final_prompt)
+    logging.info(final_prompt)
 
     try:
         headers = {"Content-type":"application/json"}

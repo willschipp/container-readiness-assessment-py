@@ -38,7 +38,7 @@ function App() {
             <Content>      
 
                 <Routes>
-                  <Route path="/" element={<Home/>}/>
+                  <Route exact path="/" element={<Home/>}/>
                   <Route path="/form" element={<RequestForm/>}/>
                   <Route path="/existing" element={<Existing/>}/>
                   <Route path="/order" element={<Order/>}/>
