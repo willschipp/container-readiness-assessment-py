@@ -36,13 +36,16 @@ def load():
 
 def parse_response(reply: str):
     if llm_name == "ollama":
+        logger.info("parsing ollama response")
         data = json.loads(reply)
         return data.get("response",None)
     elif llm_name == "dev":
+        logger.info("parsing gemini response")
         # parse gemini
         response = parse_json_to_gemini_response(reply)
         return response.candidates[0].content.parts[0].text #location of the detailed response
     else:
+        logger.info("parsing other response")
         # parse 'content'
         data = json.loads(reply)
         return data.get("content",None)
