@@ -48,7 +48,7 @@ function Order() {
 
     return (
 
-        <Content width="calc(100% - size-1000)">
+        <Content width="calc(100% - size-1000)">            
             <TableView aria-label="Order">
                 <TableHeader>
                     <Column>Order ID</Column>

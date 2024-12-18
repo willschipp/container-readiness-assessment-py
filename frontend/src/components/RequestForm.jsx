@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useNavigate } from 'react-router-dom';
-import { Form, TextArea, Button, Picker, Item, TextField  } from '@adobe/react-spectrum';
+import { Form, TextArea, Button, Picker, Item, TextField, Content, Heading  } from '@adobe/react-spectrum';
 
 function RequestForm() {
     const [data, setData] = React.useState([]);
@@ -24,7 +24,7 @@ function RequestForm() {
     }
   
     React.useEffect(() => {
-      fetchData();
+      fetchData();      
     }, []);
   
     const handleSubmit = (e) => {
@@ -54,18 +54,36 @@ function RequestForm() {
       });
     }
   
-    return (     
-      <Form onSubmit={handleSubmit} maxWidth="size-5000">
-        <TextField label="Application ID" value={app_id} onChange={setAppId}/>
-        <TextField label="User ID" value={user_id} onChange={setUserId}/>
-        <Picker label="Choose application language" onSelectionChange={setLangauge}>
-          { data.map(item => (
-            <Item key={item}>{item}</Item>
-          ))}
-        </Picker>
-        <TextArea label="Copy & Paste your build file here" minWidth="size-3600" isRequired={true} value={config_text} onChange={setConfigText}/>
-        <Button type="submit" maxWidth="size-1000">Submit</Button>
-      </Form>
+    return (  
+      <Content width="calc(100% - size-1000)">
+        <Heading level={4}>The Process</Heading>
+              <p>
+                  Complete the form to identify your application, including the AppID, your user ID, what development language it is written in, and a copy of the build file.
+              </p>
+              <p>
+                  A build file could be;
+              </p>
+              <ul>
+                  <li>pom.xml</li>
+                  <li>build.gradle</li>
+                  <li>package.json</li>
+                  <li>requirements.txt</li>
+              </ul>
+              <p>
+                Once you've completed the form, click "Submit" and you will receive an "Order ID".  Your from will be processed in the background.
+              </p>
+        <Form onSubmit={handleSubmit} maxWidth="size-5000">
+          <TextField label="Application ID" value={app_id} onChange={setAppId}/>
+          <TextField label="User ID" value={user_id} onChange={setUserId}/>
+          <Picker label="Choose application language" onSelectionChange={setLangauge}>
+            { data.map(item => (
+              <Item key={item}>{item}</Item>
+            ))}
+          </Picker>
+          <TextArea label="Copy & Paste your build file here" isRequired={true} value={config_text} onChange={setConfigText}/>
+          <Button type="submit" maxWidth="size-1000">Submit</Button>
+        </Form>
+      </Content>
     );
   }
   

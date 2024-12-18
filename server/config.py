@@ -13,7 +13,7 @@ class Config:
 
 class DevConfig(Config):
     URL = os.getenv("S3_URL","localhost:9000")
-    KEY = os.getenv("KEY","gjUHI2lScQ6JhwnbBkas")
+    KEY = os.getenv("KEY","OGQwFD9k9yMf7DuaAV4M")
     SECRET = os.getenv("SECRET")
     LLM_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=API_KEY"
     LLM_KEY = os.getenv("LLM_KEY")

@@ -162,7 +162,7 @@ def step_create_dockerfile(job: Job):
         docker_file = convert_to_dockerfile(answer)
         save_string(docker_file,job.order_id,"Dockerfile")
     except Exception as err:
-        logger.error(f"error occurred parsing dockerfile - continuing {err}")
+        logger.error(f"error occurred parsing dockerfile - continuing: {err}")
     # update the job to step 2
     job.current_step = 2
     # save the job
@@ -201,7 +201,7 @@ def step_create_deployment_yaml(job: Job):
         deployment_yaml = convert_to_yaml(answer)
         save_string(deployment_yaml,job.order_id,"deployment.yaml")
     except Exception as err:
-        logger.error(f"error occurred parsing deployment yaml - continuing {err}")
+        logger.error(f"error occurred parsing deployment yaml - continuing: {err}")
     # update the job to step 3
     job.current_step = 3
     # save the job
@@ -239,7 +239,7 @@ def step_create_service_yaml(job: Job):
         service_yaml = convert_to_yaml(answer)
         save_string(service_yaml,job.order_id,"service.yaml")
     except Exception as err:
-        logger.error(f"error occurred parsing service yaml - continuing {err}")
+        logger.error(f"error occurred parsing service yaml - continuing: {err}")
     # update the job to step 4 (finished)
     job.current_step = 4
     # save the job

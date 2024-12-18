@@ -2,7 +2,9 @@ import yaml
 
 def convert_to_yaml(yaml_string) -> str:
     # scrub the string
-    yaml_string = yaml_string.strip().replace("```yaml","").replace("```","")    
+    # yaml_string = yaml_string.strip().replace("```yaml","").replace("```","") 
+    yaml_string = yaml_string.strip().replace("```yaml","```") # remove the ```yaml part
+    yaml_string = yaml_string.strip().split("```")[1] #return the code after the backtick block   
     # convert to yaml object
     yaml_data = yaml.safe_load(yaml_string)
     # send back as a 'clean' string
