@@ -1,15 +1,29 @@
 import unittest
 import json
+import os
 from flask import Flask
 from server.handler.routes import main 
 from server.model.form import Form
 from server.model.encoder import Encoder
+from server.service.process import load
+from server.service.s3 import create_bucket, clean_up
 
 class TestSubmitFiles(unittest.TestCase):
     def setUp(self):
         self.app = Flask(__name__)
         self.app.register_blueprint(main)
         self.client = self.app.test_client()
+        self.secret = os.getenv("SECRET")
+        self.url = "localhost:9000"
+        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+
+
+        load()
+        # create the dev bucket if it doesn't exist
+        create_bucket("dev-bucket",self.url,self.key,self.secret)        
+
+    def tearDown(self):
+        clean_up(self.url,self.key,self.secret)               
 
     def test_submit_files_success(self):
         # Test successful JSON submission
