@@ -172,3 +172,22 @@ def save_file_in_folder(file_path, folder_name, bucket_name, object_name, url, k
     except S3Error as err:
         print("error ", err)    
 
+def get_file_in_folder(file_path,folder_name,bucket_name,object_name,url,key, secret, secure=False):
+    client = Minio(
+        url,
+        access_key=key,
+        secret_key=secret,
+        secure=secure
+    )
+
+    try:
+
+        # append name
+        get_name = folder_name + '/' + object_name
+
+        client.fget_object(
+            bucket_name=bucket_name,
+            object_name=get_name,
+            file_path=file_path)
+    except S3Error as err:
+        print("error ", err)    
