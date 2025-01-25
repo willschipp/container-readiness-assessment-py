@@ -12,10 +12,10 @@ class TestFormEncoder(unittest.TestCase):
         # serialize to json
         json_str = json.dumps(form,cls=Encoder)
         expected_json = {
-            "userid":"user123",
-            "appid":"app123",
-            "applanguage":"java",
-            "configtext":"some config text here"
+            "user_id":"user123",
+            "app_id":"app123",
+            "app_language":"java",
+            "config_text":"some config text here"
         }
         self.assertEqual(json.loads(json_str),expected_json)
 

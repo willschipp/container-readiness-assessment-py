@@ -8,7 +8,7 @@ import uuid
 
 from server.model.form import Form
 from server.model.job import Job
-from server.service.process import create_job, process_job, start_background, step_is_self_contained, step_finished_job, step_create_dockerfile
+from server.service.process import create_job, process_job, start_background, step_is_self_contained, step_finished_job, step_create_dockerfile, load
 from server.service.s3 import create_bucket, list_files, clean_up, get_file
 
 class TestProcess(unittest.TestCase):
@@ -16,7 +16,10 @@ class TestProcess(unittest.TestCase):
     def setUp(self):
         self.secret = os.getenv("SECRET")
         self.url = "localhost:9000"
-        self.key = "gjUHI2lScQ6JhwnbBkas"
+        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+        load()
+        # create the dev bucket if it doesn't exist
+        create_bucket("dev-bucket",self.url,self.key,self.secret)
 
     def tearDown(self):
         clean_up(self.url,self.key,self.secret)        
