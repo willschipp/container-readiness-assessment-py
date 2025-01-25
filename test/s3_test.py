@@ -3,7 +3,7 @@ import os
 import tempfile
 import uuid
 
-from server.service.s3 import save_file, get_buckets, list_files, get_file, clean_up, create_bucket, create_folder, list_folder_files, save_file_in_folder, get_file_in_folder
+from server.service.s3 import save_file, get_buckets, list_files, get_file, clean_up, create_bucket, create_folder, list_folder_files, save_file_in_folder, get_file_in_folder, get_folders
 
 class TestS3(unittest.TestCase):
 
@@ -111,7 +111,8 @@ class TestS3(unittest.TestCase):
         os.remove(temp_file_path)
         # now list
         files = list_folder_files(bucketname,"temp_folder",self.url,self.key,self.secret)
-        self.assertTrue(len(files) == 1) # only the folder should be listed        
+        self.assertTrue(len(files) == 1) # only a single file
+        print(files)
         # retrieve a single file
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
             pass
@@ -121,6 +122,9 @@ class TestS3(unittest.TestCase):
             content = file.read()
         self.assertTrue(len(content) > 0)
         os.remove(temp_file_path)
+        files = get_folders(bucketname,self.url,self.key,self.secret)
+        self.assertTrue(len(files) == 1) # only the folder should be listed        
+
 
         
 if __name__ == '__main__':

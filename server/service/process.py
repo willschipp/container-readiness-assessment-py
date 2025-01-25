@@ -11,7 +11,7 @@ from ..model.job import Job
 from ..model.response import parse_json_to_gemini_response
 from ..model.encoder import Encoder, load_prompts
 
-from ..service.s3 import save_file, list_files, get_buckets, get_file
+from ..service.s3 import list_folder_files, get_folders, get_file_in_folder, save_file_in_folder
 from ..service.llm import clean_string, call_llm
 from ..service.file_formatter import convert_to_dockerfile, convert_to_yaml
 
@@ -25,14 +25,19 @@ llm_name = ""
 
 logger = setup_logging()
 
+bucket_name = ""
+
 def load():
     global prompts
     global llm_name
+    global bucket_name
     if len(prompts) <= 0:
         logger.info("prompts loaded")
         prompts = load_prompts()
         # load the environment
         llm_name = os.getenv('RUN_MODE','dev')
+        # load the bucket-name
+        bucket_name = os.getenv('BUCKET_NAME','dev-bucket')
 
 def parse_response(reply: str):
     if llm_name == "ollama":
@@ -51,7 +56,7 @@ def parse_response(reply: str):
         return data.get("content",None)
 
 
-def save_string(content: str,bucket_name: str,obj_name: str):
+def save_string(content: str,folder_name: str,obj_name: str):
     # persist job object by writing it out to json
     with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
         temp_file.write(content)
@@ -60,7 +65,8 @@ def save_string(content: str,bucket_name: str,obj_name: str):
     # file is written --> save
     current_config = config[os.getenv('RUN_MODE','dev')]
 
-    save_file(temp_file_path,bucket_name,obj_name,current_config.URL,current_config.KEY,current_config.SECRET)
+    # save_file(temp_file_path,bucket_name,obj_name,current_config.URL,current_config.KEY,current_config.SECRET)
+    save_file_in_folder(temp_file_path, folder_name, bucket_name, obj_name, current_config.URL,current_config.KEY,current_config.SECRET)
 
     logger.info(f"file {obj_name} saved")
     # clean up the file
@@ -272,11 +278,17 @@ def find_active_jobs():
     #config
     current_config = config[os.getenv('RUN_MODE','dev')]
 
-    bucket_names = get_buckets(current_config.URL,current_config.KEY,current_config.SECRET)
-    for bucket_name in bucket_names:
+    # bucket_names = get_buckets(current_config.URL,current_config.KEY,current_config.SECRET)
+
+    folder_names = get_folders(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
+
+    for folder_name in folder_names:
         finished = False
         # get all the files
-        file_names = list_files(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
+        # file_names = list_files(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
+
+        file_names = list_folder_files(bucket_name,folder_name,current_config.URL,current_config.KEY,current_config.SECRET)
+
         for file_name in file_names:
             # first check for 'finished.json'
             if file_name == 'finished.json':
@@ -288,7 +300,8 @@ def find_active_jobs():
             # retrieve the job
             with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
                 pass
-            get_file(temp_file.name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+            # get_file(temp_file.name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
+            get_file_in_folder(temp_file.name,folder_name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
             # read into json
             with open(temp_file.name,'r') as job_file:
                 data = json.load(job_file)
