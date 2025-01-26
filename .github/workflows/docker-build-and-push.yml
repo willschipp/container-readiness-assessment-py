@@ -20,6 +20,7 @@ jobs:
           password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build Docker image
+        working-directory: ./app
         run: docker build -t quay.io/${{ secrets.QUAY_USERNAME }}/kcrap:latest -f Dockerfile .
 
       - name: Push Docker image to Quay.io

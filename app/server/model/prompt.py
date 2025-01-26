@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-import os
-import json
 
 @dataclass
 class Prompt:

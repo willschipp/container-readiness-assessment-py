@@ -3,15 +3,16 @@ import tempfile
 import json
 import os
 
-from ..logging_config import setup_logging
-from ..config import config
+from logging_config import setup_logging
+from config import config
 
-from ..model.form import Form
-from ..model.encoder import load_prompts
+from model.form import Form
+from model.encoder import load_prompts
 
-from ..service.process import create_job
-from ..service.order_management import get_job_by_order_id, get_all_orders
-from ..service.s3 import get_file, list_files
+from service.process import create_job
+from service.order_management import get_job_by_order_id, get_all_orders
+from service.s3 import get_file, list_files
+
 
 logger = setup_logging()
 

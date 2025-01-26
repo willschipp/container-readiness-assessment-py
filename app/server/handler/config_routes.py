@@ -1,8 +1,8 @@
 from flask import Blueprint, send_file, request, jsonify
 
-from ..logging_config import setup_logging
-from ..config import config
-from ..model.encoder import class_to_json
+from logging_config import setup_logging
+from config import config
+from model.encoder import class_to_json
 
 cfg = Blueprint('cfg',__name__)
 

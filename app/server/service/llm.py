@@ -6,9 +6,9 @@ import os
 
 import xml.etree.ElementTree as Element
 
-from ..model.response import GeminiResponse
-from ..config import config
-from ..logging_config import setup_logging
+from model.response import GeminiResponse
+from config import config
+from logging_config import setup_logging
 
 logger = setup_logging()
 

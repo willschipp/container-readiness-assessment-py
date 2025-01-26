@@ -3,15 +3,15 @@ import os
 import tempfile
 
 
-from ..model.order import Order
-from ..model.job import Job
-from ..model.form import Form
-from ..model.encoder import Encoder
+from model.order import Order
+from model.job import Job
+from model.form import Form
+from model.encoder import Encoder
 
-from ..service.s3 import list_files, get_file, get_buckets
+from service.s3 import list_files, get_file, get_buckets
 
-from ..config import config
-from ..logging_config import setup_logging
+from config import config
+from logging_config import setup_logging
 
 logger = setup_logging()
 
