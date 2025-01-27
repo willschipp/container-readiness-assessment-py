@@ -33,4 +33,4 @@ ENV FLASK_CONFIG=default
 
 EXPOSE 5000
 
-CMD ["flask","run"]
+ENTRYPOINT ["python","/app/server/server.py"]

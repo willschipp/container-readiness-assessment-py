@@ -1,21 +1,31 @@
 from flask import Flask, send_from_directory
-import logging
+from flask.logging import default_handler
+from logging_config import setup_logging
+
 import os
+import sys
 
-from .logging_config import setup_logging
-from .handler.routes import main as main_blueprint
-from .handler.config_routes import cfg as main_config
-from .service.process import start_background
+from handler.routes import main as main_blueprint
+from handler.config_routes import cfg as main_config
+from service.process import start_background
 
-logger = setup_logging()
+
+# initial checks for keys being set
+if 'SECRET' not in os.environ:
+    print("SECRET for s3 not set... exiting\n")
+    sys.exit(1)
 
 def init_app(config_name='default'):
-    # app = Flask(__name__,static_folder='../frontend/build',static_url_path='/')
     app = Flask(__name__,static_folder='../frontend/build')
     app.register_blueprint(main_blueprint)
     app.register_blueprint(main_config)
+    # logging
+    setup_logging()
+    app.logger.removeHandler(default_handler) # remove the default
+
     return app
 
+# initiate the app
 app = init_app(os.getenv('FLASK_CONFIG') or 'default')
 
 # star the processing
@@ -30,5 +40,5 @@ def serve(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 if __name__ == "__main__":
-    logger.info("starting...")    
-    app.run()
+    app.logger.info("starting...")    
+    app.run(host='0.0.0.0',port=5000,threaded=True)

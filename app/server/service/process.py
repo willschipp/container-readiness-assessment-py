@@ -6,24 +6,23 @@ import threading
 import time
 import uuid
 
-from ..model.form import Form
-from ..model.job import Job
-from ..model.response import parse_json_to_gemini_response
-from ..model.encoder import Encoder, load_prompts
+from model.form import Form
+from model.job import Job
+from model.response import parse_json_to_gemini_response
+from model.encoder import Encoder, load_prompts
 
-from ..service.s3 import list_folder_files, get_folders, get_file_in_folder, save_file_in_folder
-from ..service.llm import clean_string, call_llm
-from ..service.file_formatter import convert_to_dockerfile, convert_to_yaml
+from service.s3 import list_folder_files, get_folders, get_file_in_folder, save_file_in_folder
+from service.llm import clean_string, call_llm
+from service.file_formatter import convert_to_dockerfile, convert_to_yaml
 
-from ..config import config
-from ..logging_config import setup_logging
+from config import config
 
 # globals
 prompts = []
 
 llm_name = ""
 
-logger = setup_logging()
+logger = logging.getLogger("service.process")
 
 bucket_name = ""
 
@@ -282,6 +281,11 @@ def find_active_jobs():
 
     folder_names = get_folders(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
 
+    # check
+    if folder_names is None:
+        logger.info("no active jobs")
+        return # done
+
     for folder_name in folder_names:
         finished = False
         # get all the files
@@ -321,6 +325,7 @@ def background_process():
 #TODO handle exception in threads
 
 def start_background():
+    logger.info("starting the backgorund process")
     for th in threading.enumerate():
         if th.name == "processing_thread":
             logger.info("thread still running")

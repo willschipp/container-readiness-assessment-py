@@ -6,11 +6,11 @@ import os
 
 import xml.etree.ElementTree as Element
 
-from ..model.response import GeminiResponse
-from ..config import config
-from ..logging_config import setup_logging
+from model.response import GeminiResponse
+from config import config
+from logging_config import setup_logging
 
-logger = setup_logging()
+logger = logging.getLogger("service.llm")
 
 # Gemini Request Payload
 gemini_request_template = '''
@@ -67,7 +67,7 @@ def call_gemini(prompt: str) -> str:
         response_string = json.dumps(response.json())
         return response_string
     except requests.exceptions.RequestException as err:
-        logging.error(f"an error occurred: {err}")
+        logging.error(f"an error occurred: {err.args[0]}")
         return None
 
 
@@ -87,7 +87,7 @@ def call_ollama(prompt: str) -> str:
         response_string = json.dumps(response.json())
         return response_string
     except requests.exceptions.RequestException as err:
-        logging.error(f"an error occurred: {err}")
+        logging.error(f"an error occurred: {err.args[0]}")
         return None
     
 

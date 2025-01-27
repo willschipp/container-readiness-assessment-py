@@ -1,6 +1,11 @@
 import io
+import logging
+
+# s3 libraries
 from minio import Minio
 from minio.error import S3Error
+
+logger = logging.getLogger("service.s3")
 
 # helper function for names
 def filter_names_with_content_after_backslash(names):
@@ -28,8 +33,8 @@ def save_file(file_path, bucket_name, object_name, url, key, secret, secure=Fals
             file_path=file_path,            
         )
         return result
-    except S3Error as err:
-        print("error ", err)
+    except Exception as err:
+        logger.error("save_file " + err.args[0])         
 
 def get_file(file_path,bucket_name,object_name,url,key, secret, secure=False):
     client = Minio(
@@ -44,8 +49,8 @@ def get_file(file_path,bucket_name,object_name,url,key, secret, secure=False):
             bucket_name=bucket_name,
             object_name=object_name,
             file_path=file_path)
-    except S3Error as err:
-        print("error ", err)
+    except Exception as err:
+        logger.error("get_file " + err.args[0])         
 
 def get_buckets(url,key,secret,secure=False):
     client = Minio(
@@ -63,8 +68,8 @@ def get_buckets(url,key,secret,secure=False):
             bucket_names.append(bucket.name)
 
         return bucket_names
-    except S3Error as err:
-        print("error ",err)      
+    except Exception as err:
+        logger.error("get_buckets " + err.args[0])         
 
 def list_files(bucket_name,url,key,secret,secure=False):
     client = Minio(
@@ -81,8 +86,8 @@ def list_files(bucket_name,url,key,secret,secure=False):
             file_names.append(file.object_name)
 
         return file_names
-    except S3Error as err:
-        print("error ",err)
+    except Exception as err:
+        logger.error("list_files " + err.args[0])      
 
 def clean_up(url,key,secret,secure=False):
     client = Minio(
@@ -99,8 +104,8 @@ def clean_up(url,key,secret,secure=False):
             for file in files:
                 client.remove_object(bucket.name,file.object_name)
             client.remove_bucket(bucket.name)
-    except S3Error as err:
-        print("error ",err)
+    except Exception as err:
+        logger.error("clean_up " + err.args[0])      
 
 def create_bucket(bucket_name,url,key,secret,secure=False):
     client = Minio(
@@ -113,8 +118,8 @@ def create_bucket(bucket_name,url,key,secret,secure=False):
     try:        
         if not client.bucket_exists(bucket_name):            
             client.make_bucket(bucket_name)
-    except S3Error as err:
-        print("error ",err)         
+    except Exception as err:
+        logger.error("create_bucket " + err.args[0])      
 
 def create_folder(bucket_name,folder_name,url,key,secret,secure=False):
     client = Minio(
@@ -129,8 +134,8 @@ def create_folder(bucket_name,folder_name,url,key,secret,secure=False):
             raise NameError("bucket doesn't exist")
             return
         client.put_object(bucket_name,folder_name + '/', io.BytesIO(b''),0)
-    except S3Error as err:
-        print("error ",err)         
+    except Exception as err:
+        logger.error("create_folder " + err.args[0])      
 
 def list_folder_files(bucket_name,folder_name,url,key,secret,secure=False):
     client = Minio(
@@ -149,8 +154,8 @@ def list_folder_files(bucket_name,folder_name,url,key,secret,secure=False):
         file_names = filter_names_with_content_after_backslash(file_names)
         # now trim out everything after the backslash
         return file_names
-    except S3Error as err:
-        print("error ",err)
+    except Exception as err:
+        logger.error("list_folder_files " + err.args[0])
 
 
 def save_file_in_folder(file_path, folder_name, bucket_name, object_name, url, key, secret, secure=False):
@@ -174,8 +179,8 @@ def save_file_in_folder(file_path, folder_name, bucket_name, object_name, url, k
             file_path=file_path,            
         )
         return result
-    except S3Error as err:
-        print("error ", err)    
+    except Exception as err:
+        logger.error("save_file_in_folder " + err.args[0])   
 
 def get_file_in_folder(file_path,folder_name,bucket_name,object_name,url,key, secret, secure=False):
     client = Minio(
@@ -193,8 +198,8 @@ def get_file_in_folder(file_path,folder_name,bucket_name,object_name,url,key, se
             bucket_name=bucket_name,
             object_name=get_name,
             file_path=file_path)
-    except S3Error as err:
-        print("error ", err)   
+    except Exception as err:
+        logger.error("get_file_in_folder " + err.args[0])        
 
 def get_folders(bucket_name,url,key, secret, secure=False):
     client = Minio(
@@ -215,5 +220,5 @@ def get_folders(bucket_name,url,key, secret, secure=False):
         file_names = filter_names_with_no_content_after_backslash(file_names)
         return file_names
 
-    except S3Error as err:
-        print("error ", err)           
+    except Exception as err:
+        logger.error("get_folders " + err.args[0])           
