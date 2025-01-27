@@ -15,7 +15,6 @@ if 'SECRET' not in os.environ:
     print("SECRET for s3 not set... exiting\n")
     sys.exit(1)
 
-
 def init_app(config_name='default'):
     app = Flask(__name__,static_folder='../frontend/build')
     app.register_blueprint(main_blueprint)

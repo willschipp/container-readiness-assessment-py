@@ -1,12 +1,13 @@
-from flask import Blueprint, send_file, request, jsonify
+import logging
 
-from logging_config import setup_logging
+from flask import Blueprint, request
+
 from config import config
 from model.encoder import class_to_json
 
 cfg = Blueprint('cfg',__name__)
 
-logger = setup_logging()
+logger = logging.getLogger("handler.config_routes")
 
 @cfg.route('/api/config/<env>',methods=['GET'])
 def get_config(env):

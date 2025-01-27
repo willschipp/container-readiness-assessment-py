@@ -1,7 +1,7 @@
 import json
+import logging
 import os
 import tempfile
-
 
 from model.order import Order
 from model.job import Job
@@ -11,9 +11,8 @@ from model.encoder import Encoder
 from service.s3 import list_files, get_file, get_buckets
 
 from config import config
-from logging_config import setup_logging
 
-logger = setup_logging()
+logger = logging.getLogger("service.order_management")
 
 def get_job_by_order_id(order_id):
     # retrieve the job.json
@@ -60,8 +59,8 @@ def get_job_by_order_id(order_id):
     try:
         with open(temp_file.name,'r') as job_file:
             data = json.load(job_file)
-    except Exception as e:
-        logger.error(f"error parsing json {e}")
+    except Exception as err:
+        logger.error(f"error parsing json {err.args[0]}")
         return None
     order.job = Job.from_dict(data)
     order.user_id = order.job.form.user_id

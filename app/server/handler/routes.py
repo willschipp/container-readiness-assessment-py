@@ -1,9 +1,9 @@
 from flask import Blueprint, send_file, request, jsonify
 import tempfile
+import logging
 import json
 import os
 
-from logging_config import setup_logging
 from config import config
 
 from model.form import Form
@@ -14,7 +14,7 @@ from service.order_management import get_job_by_order_id, get_all_orders
 from service.s3 import get_file, list_files
 
 
-logger = setup_logging()
+logger = logging.getLogger("handler.routes")
 
 prompts = []
 
