@@ -1,11 +1,9 @@
 # build from centos
 FROM quay.io/centos/centos:stream9 as builder
 
-RUN yum install gcc-c++ -y
+RUN yum install gcc-c++ python3-pip cmake curl -y
 
 RUN dnf -y install gcc make automake git
-
-RUN yum install -y python3-pip cmake
 
 WORKDIR /app
 
