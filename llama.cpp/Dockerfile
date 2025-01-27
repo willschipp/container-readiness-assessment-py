@@ -3,7 +3,9 @@ FROM quay.io/centos/centos:stream9 as builder
 
 RUN yum install gcc-c++ python3-pip cmake -y
 
-RUN dnf -y install gcc make automake git
+RUN dnf -y install gcc make automake git llvm-toolset gcc-gfortran
+
+RUN dnf group install "Development Tools"
 
 WORKDIR /app
 
