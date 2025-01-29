@@ -7,6 +7,7 @@ import sys
 
 from handler.routes import main as main_blueprint
 from handler.config_routes import cfg as main_config
+from handler.prompt_routes import prompt as prompt_config
 from service.process import start_background
 
 
@@ -19,6 +20,7 @@ def init_app(config_name='default'):
     app = Flask(__name__,static_folder='../frontend/build')
     app.register_blueprint(main_blueprint)
     app.register_blueprint(main_config)
+    app.register_blueprint(prompt_config)
     # logging
     setup_logging()
     app.logger.removeHandler(default_handler) # remove the default
