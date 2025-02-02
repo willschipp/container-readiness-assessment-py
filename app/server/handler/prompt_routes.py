@@ -7,31 +7,30 @@ import os
 from model.encoder import load_prompts
 from model.prompt import Prompt
 
-from service.process import reset_prompts
+from service.process import reset_prompts, get_prompts
 
 logger = logging.getLogger("handler.prompt_routes")
 
 # globals
 prompts = []
 
-main = Blueprint('prompts',__name__)
+prompt_handler = Blueprint('prompt_handler',__name__)
 
 def load():
     global prompts
-    if len(prompts) <= 0:
-        logger.info("prompts loaded")
-        prompts = load_prompts()
+    logger.info("prompts loaded")
+    prompts = get_prompts()
 
 
-@main.route('/api/prompts',methods=['GET'])
+@prompt_handler.route('/api/prompts',methods=['GET'])
 def get_orders():
+    load()
     logger.info("getting all orders")
     return jsonify(prompts),200
 
 
-@main.route('/api/prompts',methods=['POST'])
+@prompt_handler.route('/api/prompts',methods=['POST'])
 def submit_prompts():
-    logger.info("prompts")
     if request.is_json:
         data = request.get_json()
 
@@ -40,11 +39,29 @@ def submit_prompts():
                 "error":"no payload"
             }), 500
         
-        prompts = Prompt.from_dict(data)
+        
+        try:
+            # loop through data
+            for data_prompt in data:
+                Prompt.from_dict(data_prompt)
+                # TODO validate if p has all the bits
+                # it parses
+        except Exception as e:
+            logger.error("error parsing submission {e}")
+            return jsonify({
+                "error":"parsing json"
+            }), 400
+
+        prompt_dict = {"prompts":data}
+
         # write it to a location and then pass it on to the process
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-            temp_file.write(prompts)
+            # temp_file.write(prompt_dict)
+            json.dump(prompt_dict,temp_file)
             temp_file_path = temp_file.name
+            temp_file.close() #flush
+
+        logger.info(temp_file_path)
 
         # upload
         reset_prompts(temp_file_path)
@@ -54,7 +71,7 @@ def submit_prompts():
 
         # reset the prompts
         logger.info("prompts updated")
-        return 204
+        return jsonify({}),204
     else:
         logger.error("Not a json file")
         return jsonify({

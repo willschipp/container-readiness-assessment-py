@@ -1,4 +1,5 @@
 from json import JSONEncoder, load, dumps
+import logging
 import os
 
 
@@ -9,6 +10,9 @@ from .job import Job
 from .order import Order
 from .prompt import Prompt
 from .response import GeminiResponse
+
+
+logger = logging.getLogger("model.encoder")
 
 class Encoder(JSONEncoder):
     def default(self, obj):

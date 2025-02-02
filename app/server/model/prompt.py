@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+import json
 
 @dataclass
 class Prompt:
@@ -13,5 +14,11 @@ class Prompt:
             prompt = data.get('prompt'),
             step = data.get('step')
         )
+    
+    def to_dict(self):
+        return asdict(self)   
+
+    def to_json(self):
+        return json.dumps(self.to_dict())        
 
    

@@ -7,7 +7,7 @@ import sys
 
 from handler.routes import main as main_blueprint
 from handler.config_routes import cfg as main_config
-from handler.prompt_routes import prompt as prompt_config
+from handler.prompt_routes import prompt_handler as prompt_config
 from service.process import start_background
 
 
