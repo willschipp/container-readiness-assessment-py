@@ -38,6 +38,16 @@ def load():
         # load the bucket-name
         bucket_name = os.getenv('BUCKET_NAME','dev-bucket')
 
+# support reloading
+def reset_prompts(location):
+    global prompts
+    prompts = load_prompts(location)
+
+
+def get_prompts():
+    load()
+    return prompts
+
 def parse_response(reply: str):
     if llm_name == "ollama":
         logger.info("parsing ollama response")

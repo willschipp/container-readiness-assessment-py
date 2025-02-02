@@ -1,4 +1,5 @@
 from json import JSONEncoder, load, dumps
+import logging
 import os
 
 
@@ -10,6 +11,9 @@ from .order import Order
 from .prompt import Prompt
 from .response import GeminiResponse
 
+
+logger = logging.getLogger("model.encoder")
+
 class Encoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj,(Form,AppLanguage,Config,Job,Order,Prompt,GeminiResponse)):
@@ -18,10 +22,10 @@ class Encoder(JSONEncoder):
     
 
 # helper function
-def load_prompts(): # TODO have location passed as a variable
+def load_prompts(location='./prompts_codellama.json'): # TODO have location passed as a variable
     current_dir = os.path.dirname(os.path.abspath(__file__))
     # file_path = os.path.join(current_dir,'./prompts.json')
-    file_path = os.path.join(current_dir,'./prompts_codellama.json')
+    file_path = os.path.join(current_dir,location)
     with open(file_path,'r') as prompt_file:
         data = load(prompt_file)
 
