@@ -4,4 +4,4 @@ key.md
 data/
 *.sh
 node_modules
-frontend/package-lock.json
+app/frontend/package-lock.json
