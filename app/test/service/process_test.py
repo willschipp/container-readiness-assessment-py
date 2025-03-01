@@ -10,13 +10,16 @@ from server.model.form import Form
 from server.model.job import Job
 from server.service.process import create_job, process_job, start_background, step_is_self_contained, step_finished_job, step_create_dockerfile, load
 from server.service.s3 import create_bucket, list_files, clean_up, get_file
+from server.config import config
 
 class TestProcess(unittest.TestCase):
 
     def setUp(self):
-        self.secret = os.getenv("SECRET")
-        self.url = "localhost:9000"
-        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+        current_config = config[os.getenv('RUN_MODE','default')]
+
+        self.secret = current_config.SECRET 
+        self.url = current_config.URL
+        self.key = current_config.KEY
         load()
         # create the dev bucket if it doesn't exist
         create_bucket("dev-bucket",self.url,self.key,self.secret)

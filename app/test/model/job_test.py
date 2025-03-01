@@ -16,7 +16,7 @@ class TestProcess(unittest.TestCase):
         # create a job object and form
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+        file_path = os.path.join(current_dir,'../examples/spring_boot_build.gradle')
         # load up the file
         with open(file_path,'r') as input:
             content = input.read()

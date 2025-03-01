@@ -3,38 +3,11 @@ import logging
 import requests
 import os
 
-
 import xml.etree.ElementTree as Element
 
-from model.response import GeminiResponse
-from config import config
-from logging_config import setup_logging
+from config import config 
 
 logger = logging.getLogger("service.llm")
-
-# Gemini Request Payload
-gemini_request_template = '''
-    {
-    "contents":
-        [
-            {
-            "parts":
-                [
-                    {"text":"CONTENT_HERE"}
-                ]
-            }
-        ]
-    }
-'''
-
-ollama_request_template = '''
-    {
-        "model":"codellama:latest",
-        "prompt":"CONTENT_HERE",
-        "format":"json",
-        "stream":false
-    }
-'''
 
 llamacpp_request_template = '''
     {
@@ -43,56 +16,11 @@ llamacpp_request_template = '''
 '''
 
 def call_llm(prompt: str,name: str) -> str:
-    if name == "llamacpp":
-        return call_llamacpp(prompt)
-    elif name == "ollama":
-        return call_ollama(prompt)
-    else:
-        return call_gemini(prompt) #default operation
-
-def call_gemini(prompt: str) -> str:
-    current_config = config[os.getenv('RUN_MODE','dev')]
-
-    final_prompt = gemini_request_template.replace("CONTENT_HERE",prompt)
-    url = current_config.LLM_URL
-    url = url.replace("API_KEY",current_config.LLM_KEY)
-
-    logging.info(final_prompt)        
-
-    try:
-        headers = {"Content-type":"application/json"}
-        response = requests.post(url,data=final_prompt,headers=headers)
-        # process response body into the json object
-        response.raise_for_status()
-        response_string = json.dumps(response.json())
-        return response_string
-    except requests.exceptions.RequestException as err:
-        logging.error(f"an error occurred: {err.args[0]}")
-        return None
-
-
-def call_ollama(prompt: str) -> str:
-    current_config = config[os.getenv('RUN_MODE','ollama')]
-
-    final_prompt = ollama_request_template.replace("CONTENT_HERE",prompt)
-    url = current_config.LLM_URL
-    
-    logging.info(final_prompt)
-
-    try:
-        headers = {"Content-type":"application/json"}
-        response = requests.post(url,data=final_prompt,headers=headers)
-        # process response body into the json object
-        response.raise_for_status()
-        response_string = json.dumps(response.json())
-        return response_string
-    except requests.exceptions.RequestException as err:
-        logging.error(f"an error occurred: {err.args[0]}")
-        return None
+    return call_llamacpp(prompt)
     
 
 def call_llamacpp(prompt: str) -> str:
-    current_config = config[os.getenv('RUN_MODE','llamacpp')]
+    current_config = config[os.getenv('RUN_MODE','default')]
 
     final_prompt = llamacpp_request_template.replace("CONTENT_HERE",prompt)
     url = current_config.LLM_URL

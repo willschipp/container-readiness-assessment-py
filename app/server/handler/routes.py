@@ -85,7 +85,7 @@ def get_languages():
 @main.route('/api/order/<order_id>/files',methods=['GET'])
 def get_files_list(order_id):
     try :
-        current_config = config[os.getenv('RUN_MODE','dev')]
+        current_config = config[os.getenv('RUN_MODE','default')]
         files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
         response = []
         for file in files:
@@ -100,7 +100,7 @@ def get_files_list(order_id):
 @main.route('/api/order/<order_id>/answer',methods=['GET'])
 def get_answers(order_id):
     try :
-        current_config = config[os.getenv('RUN_MODE','dev')]
+        current_config = config[os.getenv('RUN_MODE','default')]
         files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
         response = []
         for file in files:
@@ -118,7 +118,7 @@ def get_answer(order_id,file_name):
     try:
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".tmp") as temp_file:
             pass
-        current_config = config[os.getenv('RUN_MODE','dev')]
+        current_config = config[os.getenv('RUN_MODE','default')]
         get_file(temp_file.name,order_id,file_name,current_config.URL,current_config.KEY,current_config.SECRET)
         with open(temp_file.name,'r') as answer_file:
             data = json.load(answer_file)            
@@ -137,7 +137,7 @@ def download_file(order_id,file_id):
         # stream back
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".tmp") as temp_file:
             pass
-        current_config = config[os.getenv('RUN_MODE','dev')]
+        current_config = config[os.getenv('RUN_MODE','default')]
         get_file(temp_file.name,order_id,file_id,current_config.URL,current_config.KEY,current_config.SECRET)
         # serve
         return send_file(temp_file.name,as_attachment=True,download_name=file_id)

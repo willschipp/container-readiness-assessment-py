@@ -2,20 +2,25 @@ import unittest
 import json
 import os
 from flask import Flask
+
 from server.handler.routes import main 
 from server.model.form import Form
 from server.model.encoder import Encoder
 from server.service.process import load
 from server.service.s3 import create_bucket, clean_up
+from server.config import config
 
 class TestSubmitFiles(unittest.TestCase):
     def setUp(self):
         self.app = Flask(__name__)
         self.app.register_blueprint(main)
         self.client = self.app.test_client()
-        self.secret = os.getenv("SECRET")
-        self.url = "localhost:9000"
-        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+
+        current_config = config[os.getenv('RUN_MODE','default')]
+
+        self.secret = current_config.SECRET 
+        self.url = current_config.URL
+        self.key = current_config.KEY
 
 
         load()

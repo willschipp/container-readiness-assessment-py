@@ -2,7 +2,7 @@ import unittest
 import os
 import json
 
-from server.service.llm import call_llm, call_gemini, call_ollama, call_llamacpp, escape_other_for_json, escape_xml_for_json, clean_string
+from server.service.llm import call_llm, escape_other_for_json, escape_xml_for_json, clean_string
 
 class TestProcess(unittest.TestCase):
 
@@ -51,7 +51,7 @@ class TestProcess(unittest.TestCase):
 
     def test_escape_gradle_for_json(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+        file_path = os.path.join(current_dir,'../examples/spring_boot_build.gradle')
         # load up the file
         with open(file_path,'r') as input:
             content = input.read()
@@ -72,7 +72,7 @@ class TestProcess(unittest.TestCase):
 
     def test_escape_xml_for_json(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir,'./examples/spring_boot_pom.xml')
+        file_path = os.path.join(current_dir,'../examples/spring_boot_pom.xml')
         # load up the file
         with open(file_path,'r') as input:
             content = input.read()
@@ -94,7 +94,7 @@ class TestProcess(unittest.TestCase):
     def test_clean_string(self):
         # try and xml first
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir,'./examples/spring_boot_pom.xml')
+        file_path = os.path.join(current_dir,'../examples/spring_boot_pom.xml')
         # load up the file
         with open(file_path,'r') as input:
             content = input.read()
@@ -114,7 +114,7 @@ class TestProcess(unittest.TestCase):
         self.assertTrue(is_valid)
         # now do a json file
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir,'./examples/spring_boot_build.gradle')
+        file_path = os.path.join(current_dir,'../examples/spring_boot_build.gradle')
         # load up the file
         with open(file_path,'r') as input:
             content = input.read()

@@ -5,12 +5,17 @@ import uuid
 
 from server.service.s3 import save_file, get_buckets, list_files, get_file, clean_up, create_bucket, create_folder, list_folder_files, save_file_in_folder, get_file_in_folder, get_folders
 
+from server.config import config
+
 class TestS3(unittest.TestCase):
 
     def setUp(self):
-        self.secret = os.getenv("SECRET")
-        self.url = "localhost:9000"
-        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+
+        current_config = config[os.getenv('RUN_MODE','default')]
+
+        self.secret = current_config.SECRET 
+        self.url = current_config.URL
+        self.key = current_config.KEY
 
     def tearDown(self):
         clean_up(self.url,self.key,self.secret)

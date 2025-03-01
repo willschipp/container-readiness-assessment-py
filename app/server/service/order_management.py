@@ -16,8 +16,7 @@ def get_job_by_order_id(order_id):
     # retrieve the job.json
     # check if there's a finished.json
     # return the files
-    current_config = config[os.getenv('RUN_MODE','dev')]
-
+    current_config = config[os.getenv('RUN_MODE','default')]
     
     # get the files
     file_names = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
@@ -71,7 +70,7 @@ def get_job_by_order_id(order_id):
 def get_all_orders():
     orders = []
     # setup access
-    current_config = config[os.getenv('RUN_MODE','dev')]
+    current_config = config[os.getenv('RUN_MODE','default')]
     bucket_names = get_buckets(current_config.URL,current_config.KEY,current_config.SECRET)
     for bucket_name in bucket_names:
         # have the order id --> for each bucket need to get the job.json

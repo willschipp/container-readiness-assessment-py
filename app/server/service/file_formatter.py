@@ -2,7 +2,6 @@ import yaml
 
 def convert_to_yaml(yaml_string) -> str:
     # scrub the string
-    # yaml_string = yaml_string.strip().replace("```yaml","").replace("```","") 
     yaml_string = yaml_string.strip().replace("```yaml","```") # remove the ```yaml part
     yaml_string = yaml_string.strip().split("```")[1] #return the code after the backtick block   
     # convert to yaml object
@@ -14,7 +13,6 @@ def convert_to_yaml(yaml_string) -> str:
 
 def convert_to_dockerfile(dockerfile_string) -> str:
     if "`" in dockerfile_string:
-        # dockerfile_string = dockerfile_string.strip().replace("```dockerfile","").replace("```","")
         dockerfile_string = dockerfile_string.strip().split("```")[1] #return the code after the backtick block
         # split into lines
         lines = dockerfile_string.strip().split('\\n')

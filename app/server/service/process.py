@@ -34,7 +34,7 @@ def load():
         logger.info("prompts loaded")
         prompts = load_prompts()
         # load the environment
-        llm_name = os.getenv('RUN_MODE','dev')
+        llm_name = os.getenv('RUN_MODE','default')
         # load the bucket-name
         bucket_name = os.getenv('BUCKET_NAME','dev-bucket')
 
@@ -49,20 +49,11 @@ def get_prompts():
     return prompts
 
 def parse_response(reply: str):
-    if llm_name == "ollama":
-        logger.info("parsing ollama response")
-        data = json.loads(reply)
-        return data.get("response",None)
-    elif llm_name == "dev":
-        logger.info("parsing gemini response")
-        # parse gemini
-        response = parse_json_to_gemini_response(reply)
-        return response.candidates[0].content.parts[0].text #location of the detailed response
-    else:
-        logger.info("parsing other response")
-        # parse 'content'
-        data = json.loads(reply)
-        return data.get("content",None)
+    # only one format --> llama.cpp response
+    logger.info("parsing other response")
+    # parse 'content'
+    data = json.loads(reply)
+    return data.get("content",None)
 
 
 def save_string(content: str,folder_name: str,obj_name: str):
@@ -72,9 +63,8 @@ def save_string(content: str,folder_name: str,obj_name: str):
         temp_file_path = temp_file.name
 
     # file is written --> save
-    current_config = config[os.getenv('RUN_MODE','dev')]
+    current_config = config[os.getenv('RUN_MODE','default')]
 
-    # save_file(temp_file_path,bucket_name,obj_name,current_config.URL,current_config.KEY,current_config.SECRET)
     save_file_in_folder(temp_file_path, folder_name, bucket_name, obj_name, current_config.URL,current_config.KEY,current_config.SECRET)
 
     logger.info(f"file {obj_name} saved")
@@ -117,13 +107,10 @@ def step_is_self_contained(job: Job):
 
     # send to the LLM
     try:
-        # result = call_gemini(prompt_string)
         result = call_llm(prompt_string,llm_name)
         # now parse the string
         logger.debug(f"result {result}")
         # parse into the response
-        # response = parse_json_to_gemini_response(result)
-        # answer = response.candidates[0].content.parts[0].text #location of the detailed response
         answer = parse_response(result)
         # save the answer
         save_string(result,job.order_id,"answer_0.json")
@@ -170,8 +157,6 @@ def step_create_dockerfile(job: Job):
     # save the answer
     save_string(result,job.order_id,"answer_1.json")
     # get the answer and write it out as a docker file
-    # response = parse_json_to_gemini_response(result)
-    # answer = response.candidates[0].content.parts[0].text 
     answer = parse_response(result)
     try:
         docker_file = convert_to_dockerfile(answer)
@@ -209,8 +194,6 @@ def step_create_deployment_yaml(job: Job):
     # save the answer
     save_string(result,job.order_id,"answer_2.json")
 
-    # response = parse_json_to_gemini_response(result)
-    # answer = response.candidates[0].content.parts[0].text 
     answer = parse_response(result)
     try:
         deployment_yaml = convert_to_yaml(answer)
@@ -247,8 +230,6 @@ def step_create_service_yaml(job: Job):
     # save the answer
     save_string(result,job.order_id,"answer_3.json")
 
-    # response = parse_json_to_gemini_response(result)
-    # answer = response.candidates[0].content.parts[0].text 
     answer = parse_response(result)
     try:
         service_yaml = convert_to_yaml(answer)
@@ -285,9 +266,7 @@ def process_job(job: Job):
 
 def find_active_jobs():
     #config
-    current_config = config[os.getenv('RUN_MODE','dev')]
-
-    # bucket_names = get_buckets(current_config.URL,current_config.KEY,current_config.SECRET)
+    current_config = config[os.getenv('RUN_MODE','default')]
 
     folder_names = get_folders(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
 
@@ -299,8 +278,6 @@ def find_active_jobs():
     for folder_name in folder_names:
         finished = False
         # get all the files
-        # file_names = list_files(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
-
         file_names = list_folder_files(bucket_name,folder_name,current_config.URL,current_config.KEY,current_config.SECRET)
 
         for file_name in file_names:
@@ -314,7 +291,6 @@ def find_active_jobs():
             # retrieve the job
             with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
                 pass
-            # get_file(temp_file.name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
             get_file_in_folder(temp_file.name,folder_name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
             # read into json
             with open(temp_file.name,'r') as job_file:
