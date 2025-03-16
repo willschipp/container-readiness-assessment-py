@@ -1,20 +1,19 @@
 from flask import Blueprint, send_file, request, jsonify
 import tempfile
-import logging
+from loguru impmort logger
 import json
-import os
 
-from config import config
+# from config import config
 
-from model.form import Form
-from model.encoder import load_prompts
+from server.model.form import Form
+from server.model.encoder import load_prompts
 
-from service.process import create_job
-from service.order_management import get_job_by_order_id, get_all_orders
-from service.s3 import get_file, list_files
+from server.service.process import create_job
+from server.service.order_management import get_job_by_order_id, get_all_orders
+from server.service.s3 import get_file, list_files_in_folder
 
 
-logger = logging.getLogger("handler.routes")
+# logger = logging.getLogger("handler.routes")
 
 prompts = []
 
@@ -22,13 +21,14 @@ main = Blueprint('main',__name__)
 
 def load():
     global prompts
+
     if len(prompts) <= 0:
         logger.info("prompts loaded")
         prompts = load_prompts()
 
 @main.route('/api/order',methods=['POST'])
 def submit_files():
-    logger.info("order")
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     if request.is_json:
         data = request.get_json()
 
@@ -38,11 +38,10 @@ def submit_files():
             }), 500
         
         form = Form.from_dict(data)
-
         # create an order id and send it back
         orderid = create_job(form)
 
-        logger.info("job " + orderid + " created")
+        logger.info(f"job {orderid}created")
         return jsonify({
             "orderid":orderid
         }), 200
@@ -54,20 +53,20 @@ def submit_files():
 
 @main.route('/api/order',methods=['GET'])
 def get_orders():
-    logger.info("getting all orders")
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     orders = get_all_orders()
     return jsonify(orders),200
 
 @main.route('/api/order/<order_id>',methods=['GET'])
 def get_order(order_id):
-    logger.info("get order")
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     order = get_job_by_order_id(order_id)
     return jsonify(order),200
 
 
 @main.route('/api/languages',methods=['GET'])
 def get_languages():
-    logger.info("getting languages")
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     #load the prompts
     load()
     # get all the app languages
@@ -84,9 +83,11 @@ def get_languages():
 
 @main.route('/api/order/<order_id>/files',methods=['GET'])
 def get_files_list(order_id):
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try :
-        current_config = config[os.getenv('RUN_MODE','dev')]
-        files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        # current_config = config[os.getenv('RUN_MODE','dev')]
+        # files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        files = list_files_in_folder(order_id)
         response = []
         for file in files:
             if '.json' not in file:
@@ -99,9 +100,11 @@ def get_files_list(order_id):
     
 @main.route('/api/order/<order_id>/answer',methods=['GET'])
 def get_answers(order_id):
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try :
-        current_config = config[os.getenv('RUN_MODE','dev')]
-        files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        # current_config = config[os.getenv('RUN_MODE','dev')]
+        # files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        files = list_files_in_folder(order_id)
         response = []
         for file in files:
             if 'answer' in file:
@@ -114,12 +117,17 @@ def get_answers(order_id):
 
 @main.route('/api/order/<order_id>/answer/<file_name>',methods=['GET'])
 def get_answer(order_id,file_name):
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     # get the explicit file, read it and stream the response to the browser
     try:
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".tmp") as temp_file:
             pass
-        current_config = config[os.getenv('RUN_MODE','dev')]
-        get_file(temp_file.name,order_id,file_name,current_config.URL,current_config.KEY,current_config.SECRET)
+
+        object_name = f"{order_id}/{file_name}"
+
+        # current_config = config[os.getenv('RUN_MODE','dev')]
+        # get_file(temp_file.name,order_id,file_name,current_config.URL,current_config.KEY,current_config.SECRET)
+        get_file(object_name, temp_file.name)
         with open(temp_file.name,'r') as answer_file:
             data = json.load(answer_file)            
         return jsonify(data),200    
@@ -131,14 +139,18 @@ def get_answer(order_id,file_name):
 
 @main.route('/api/download/<order_id>/<file_id>',methods=['GET'])
 def download_file(order_id,file_id):
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try:
         # setup the temporary file
         # download from s3
         # stream back
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".tmp") as temp_file:
             pass
-        current_config = config[os.getenv('RUN_MODE','dev')]
-        get_file(temp_file.name,order_id,file_id,current_config.URL,current_config.KEY,current_config.SECRET)
+
+        object_name = f"{order_id}/{file_name}"
+        # current_config = config[os.getenv('RUN_MODE','dev')]
+        # get_file(temp_file.name,order_id,file_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        get_file(object_name, temp_file.name)
         # serve
         return send_file(temp_file.name,as_attachment=True,download_name=file_id)
         # TODO clean up

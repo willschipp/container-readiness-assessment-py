@@ -1,0 +1,58 @@
+#
+# Settings.
+#
+# This file is committed to Git.
+#
+# Set active runtime environment in .env file or in os environment (ENV_FOR_DYNACONF=<whatever>).
+#
+# Do *not* place secrets in this file. Use .secrets.toml file instead.
+# Do *not* place local settings which must not be committed to Git in this file. Use .settings.toml file instead.
+#
+
+[default] # Environment for default/fallback values
+# Logging
+log_levels = ['TRACE', 'DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR', 'CRITICAL']
+log_level = 'DEBUG'
+log_json = false
+# Log file
+log_file = 'log/app_{time}.log'
+log_file_rotation = '1 MB'
+log_file_retention_days = 7
+# Flask
+flask_host = '0.0.0.0'
+flask_port = 5000
+# Background process
+background_sleep_seconds = 5
+# S3
+s3_url = 'localhost:9000'
+s3_bucket_name = 'bucket'
+s3_access_key_id = 'Set in .secrets.toml or OS environment'
+s3_secret_access_key = 'Set in .secrets.toml or OS environment'
+# LLM
+llm_names = ['gemini', 'ollama', 'llamacpp']
+llm_name = 'gemini' # Select from llm_names
+llm_url_gemini = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=API_KEY'
+llm_url_ollama = 'http://localhost:11434/api/generate'
+llm_url_llamacpp = 'http://localhost:8080/completion'
+llm_key = 'Set in .secrets.toml or OS environment'
+llm_prompts_steps = 4
+
+[local] # Default environment
+# S3
+s3_bucket_name = 'dev-bucket'
+
+[development]
+# S3
+s3_bucket_name = 'dev-bucket'
+
+[staging]
+# Logging
+log_level = 'INFO'
+# S3
+s3_bucket_name = 'staging-bucket'
+
+[production]
+# Logging
+log_level = 'INFO'
+# S3
+s3_bucket_name = 'bucket'

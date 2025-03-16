@@ -3,27 +3,17 @@ import os
 import tempfile
 import uuid
 
-from server.service.s3 import save_file, get_buckets, list_files, get_file, clean_up, create_bucket, create_folder, list_folder_files, save_file_in_folder, get_file_in_folder, get_folders
+from server.service.s3 import get_buckets, list_files, get_file, clean_up, create_bucket, create_folder, list_folder_files, save_file_in_folder, get_file_in_folder, get_folders
 
 class TestS3(unittest.TestCase):
 
     def setUp(self):
-        self.secret = os.getenv("SECRET")
+        self.secret = "mytestsecret"
         self.url = "localhost:9000"
-        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+        self.key = "mytestkey"
 
     def tearDown(self):
         clean_up(self.url,self.key,self.secret)
-
-    def test_save(self):
-        # bucketname = "testbucket"
-        bucketname = str(uuid.uuid4()).replace('-','')
-        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-            temp_file.write('{"hello":"world"}')
-            temp_file_path = temp_file.name
-        
-        save_file(temp_file_path,bucketname,"test_obj",self.url,self.key,self.secret)
-        os.remove(temp_file_path)
 
     def test_getBuckets(self):
         bucketname = str(uuid.uuid4()).replace('-','')
