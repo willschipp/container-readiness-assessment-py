@@ -2,15 +2,16 @@ import json
 import logging
 import requests
 import os
+from loguru import logger
 
 
 import xml.etree.ElementTree as Element
 
-from model.response import GeminiResponse
-from config import config
-from logging_config import setup_logging
+from server.model.response import GeminiResponse
+# from config import config
+# from logging_config import setup_logging
 
-logger = logging.getLogger("service.llm")
+# logger = logging.getLogger("service.llm")
 
 # Gemini Request Payload
 gemini_request_template = '''

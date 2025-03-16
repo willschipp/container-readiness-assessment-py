@@ -14,12 +14,12 @@ from server.service.s3 import create_bucket, list_files, clean_up, get_file
 class TestProcess(unittest.TestCase):
 
     def setUp(self):
-        self.secret = os.getenv("SECRET")
+        self.secret = "mytestsecret"
         self.url = "localhost:9000"
-        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+        self.key = "mytestkey"
         load()
-        # create the dev bucket if it doesn't exist
-        create_bucket("dev-bucket",self.url,self.key,self.secret)
+        # create_bucket("dev-bucket",self.url,self.key,self.secret)        
+        create_bucket("dev-bucket")
 
     def tearDown(self):
         clean_up(self.url,self.key,self.secret)        

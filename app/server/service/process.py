@@ -5,61 +5,53 @@ import tempfile
 import threading
 import time
 import uuid
+from loguru import logger
 
-from model.form import Form
-from model.job import Job
-from model.response import parse_json_to_gemini_response
-from model.encoder import Encoder, load_prompts
+from server.configuration import settings
+import server.constants as constants
 
-from service.s3 import list_folder_files, get_folders, get_file_in_folder, save_file_in_folder
-from service.llm import clean_string, call_llm
-from service.file_formatter import convert_to_dockerfile, convert_to_yaml
+from server.model.form import Form
+from server.model.job import Job
+from server.model.response import parse_json_to_gemini_response
+from server.model.encoder import Encoder, load_prompts
 
-from config import config
+from server.service.s3 import list_folder_files, list_folders, get_file_from_folder, put_file_to_folder, is_file_in_folder
+from server.service.llm import clean_string, call_llm
+from server.service.file_formatter import convert_to_dockerfile, convert_to_yaml
+
 
 # globals
 prompts = []
 
-llm_name = ""
-
-logger = logging.getLogger("service.process")
-
-bucket_name = ""
 
 def load():
     global prompts
-    global llm_name
-    global bucket_name
     if len(prompts) <= 0:
         logger.info("prompts loaded")
         prompts = load_prompts()
-        # load the environment
-        llm_name = os.getenv('RUN_MODE','dev')
-        # load the bucket-name
-        bucket_name = os.getenv('BUCKET_NAME','dev-bucket')
 
 # support reloading
 def reset_prompts(location):
     global prompts
     prompts = load_prompts(location)
 
-
 def get_prompts():
     load()
     return prompts
 
 def parse_response(reply: str):
-    if llm_name == "ollama":
+    if settings.llm_name == constants.LLM_NAME_GEMINI:
         logger.info("parsing ollama response")
         data = json.loads(reply)
         return data.get("response",None)
-    elif llm_name == "dev":
+    elif settings.llm_name == constants.LLM_NAME_OLLAMA:
         logger.info("parsing gemini response")
         # parse gemini
         response = parse_json_to_gemini_response(reply)
         return response.candidates[0].content.parts[0].text #location of the detailed response
     else:
-        logger.info("parsing other response")
+        # llama cpp default
+        logger.info("parsing llamacpp response")
         # parse 'content'
         data = json.loads(reply)
         return data.get("content",None)
@@ -72,10 +64,11 @@ def save_string(content: str,folder_name: str,obj_name: str):
         temp_file_path = temp_file.name
 
     # file is written --> save
-    current_config = config[os.getenv('RUN_MODE','dev')]
+    # current_config = config[os.getenv('RUN_MODE','dev')]
 
     # save_file(temp_file_path,bucket_name,obj_name,current_config.URL,current_config.KEY,current_config.SECRET)
-    save_file_in_folder(temp_file_path, folder_name, bucket_name, obj_name, current_config.URL,current_config.KEY,current_config.SECRET)
+    # save_file_in_folder(temp_file_path, folder_name, bucket_name, obj_name, current_config.URL,current_config.KEY,current_config.SECRET)
+    put_file_to_folder(temp_file_path,folder_name,obj_name)
 
     logger.info(f"file {obj_name} saved")
     # clean up the file
@@ -93,7 +86,7 @@ def create_job(form: Form) -> str:
     # persist job object by writing it out to json
     json_string = json.dumps(job,cls=Encoder)
     # save it
-    save_string(json_string,order_id,"job.json")
+    save_string(json_string,order_id,constants.FILE_NAME_JOB)
     # log
     logger.info(f"job {job.order_id} created and saved")
     # start thread
@@ -118,7 +111,7 @@ def step_is_self_contained(job: Job):
     # send to the LLM
     try:
         # result = call_gemini(prompt_string)
-        result = call_llm(prompt_string,llm_name)
+        result = call_llm(prompt_string,settings.llm_name)
         # now parse the string
         logger.debug(f"result {result}")
         # parse into the response
@@ -133,7 +126,7 @@ def step_is_self_contained(job: Job):
             job.current_step = 1
             # save the job
             json_string = json.dumps(job,cls=Encoder)
-            save_string(json_string,job.order_id,"job.json")
+            save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
             # log it
             logger.info(f"job {job.order_id} updated and saved")
         else:
@@ -164,7 +157,7 @@ def step_create_dockerfile(job: Job):
             break          
 
     # send to the LLM
-    result = call_llm(prompt_string,llm_name)
+    result = call_llm(prompt_string,settings.llm_name)
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
@@ -182,7 +175,7 @@ def step_create_dockerfile(job: Job):
     job.current_step = 2
     # save the job
     json_string = json.dumps(job,cls=Encoder)
-    save_string(json_string,job.order_id,"job.json")
+    save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
     # log it
     logger.info(f"job {job.order_id} updated and saved")
 
@@ -203,7 +196,7 @@ def step_create_deployment_yaml(job: Job):
             break          
 
     # send to the LLM
-    result = call_llm(prompt_string,llm_name)
+    result = call_llm(prompt_string,settings.llm_name)
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
@@ -221,7 +214,7 @@ def step_create_deployment_yaml(job: Job):
     job.current_step = 3
     # save the job
     json_string = json.dumps(job,cls=Encoder)
-    save_string(json_string,job.order_id,"job.json")
+    save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
 
     logger.info(f"job {job.order_id} updated and saved")
 
@@ -241,7 +234,7 @@ def step_create_service_yaml(job: Job):
             break          
 
     # send to the LLM
-    result = call_llm(prompt_string,llm_name)
+    result = call_llm(prompt_string,settings.llm_name)
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
@@ -259,7 +252,7 @@ def step_create_service_yaml(job: Job):
     job.current_step = 4
     # save the job
     json_string = json.dumps(job,cls=Encoder)
-    save_string(json_string,job.order_id,"job.json")
+    save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
 
     logger.info(f"job {job.order_id} updated and saved")
     # directly invoke close out
@@ -267,7 +260,7 @@ def step_create_service_yaml(job: Job):
 
 def step_finished_job(job: Job):
     # create the "finished.json" file and write it back
-    save_string("",job.order_id,"finished.json")
+    save_string("",job.order_id,constants.FILE_NAME_FINISHED)
 
     logger.info(f"job {job.order_id} finished")
     return
@@ -285,45 +278,49 @@ def process_job(job: Job):
 
 def find_active_jobs():
     #config
-    current_config = config[os.getenv('RUN_MODE','dev')]
-
+    
     # bucket_names = get_buckets(current_config.URL,current_config.KEY,current_config.SECRET)
 
-    folder_names = get_folders(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
+    # folder_names = get_folders(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
+    folder_names = list_folders()
 
-    # check
-    if folder_names is None:
-        logger.info("no active jobs")
-        return # done
+    if type(folder_names) is list and len(folder_names) > 0:
+        finished_count = 0
 
-    for folder_name in folder_names:
-        finished = False
-        # get all the files
-        # file_names = list_files(bucket_name,current_config.URL,current_config.KEY,current_config.SECRET)
+        # Folders in bucket
+        for folder_name in folder_names:
+            # Files in folder
+            if not is_file_in_folder(folder_name, constants.FILE_NAME_FINISHED):
+                logger.info(f"{folder_name} Process")
 
-        file_names = list_folder_files(bucket_name,folder_name,current_config.URL,current_config.KEY,current_config.SECRET)
+                # Retrieve job and process
+                with tempfile.NamedTemporaryFile(
+                    mode="w+", delete=False, suffix=".json"
+                ) as temp_file:
+                    # Empty file
+                    pass
+                get_file_from_folder(
+                    folder_name, constants.FILE_NAME_JOB, temp_file.name
+                )
+                with open(temp_file.name, "r") as job_file:
+                    job_content = json.load(job_file)
+                os.remove(temp_file.name)
 
-        for file_name in file_names:
-            # first check for 'finished.json'
-            if file_name == 'finished.json':
-                # done
-                finished = True
-                break
-        
-        if finished == False:
-            # retrieve the job
-            with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".json") as temp_file:
-                pass
-            # get_file(temp_file.name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
-            get_file_in_folder(temp_file.name,folder_name,bucket_name,"job.json",current_config.URL,current_config.KEY,current_config.SECRET)
-            # read into json
-            with open(temp_file.name,'r') as job_file:
-                data = json.load(job_file)
-            job = Job.from_dict(data)
-            # clean up
-            os.remove(temp_file.name)
-            # process job
-            process_job(job)        
+                # Process job
+                process_job(Job.from_dict(job_content))
+            else:
+                finished_count += 1
+                logger.info(f"{folder_name} Finished")
+
+        logger.info(f"{finished_count} of {len(folder_names)} jobs finished")
+        if finished_count == len(folder_names):
+            return False
+        else:
+            return True
+    else:
+        logger.info("No jobs found")
+        return False
+       
 
 def background_process():
     while True:

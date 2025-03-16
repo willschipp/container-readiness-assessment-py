@@ -72,17 +72,6 @@ def put_file(file_path: str, object_name: str, bucket_name=None) -> object:
 
 
 def get_file(object_name, file_path, bucket_name=None):
-    """
-    Downloads a file from a S3 bucket and saves it to the specified file path.
-
-    Args:
-        object_name (str): The name of the object in the S3 bucket.
-        file_path (str): The path to the file where the object will be saved.
-        bucket_name (str, optional): The name of the S3 bucket. Defaults to settings.s3_bucket_name.
-
-    Raises:
-        Exception: If an error occurs during the file download.
-    """
     if bucket_name is None:
         bucket_name = settings.s3_bucket_name
     logger.debug(

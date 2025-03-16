@@ -1,9 +1,7 @@
 from flask import Blueprint, send_file, request, jsonify
 import tempfile
-from loguru impmort logger
+from loguru import logger
 import json
-
-# from config import config
 
 from server.model.form import Form
 from server.model.encoder import load_prompts
@@ -12,8 +10,6 @@ from server.service.process import create_job
 from server.service.order_management import get_job_by_order_id, get_all_orders
 from server.service.s3 import get_file, list_files_in_folder
 
-
-# logger = logging.getLogger("handler.routes")
 
 prompts = []
 

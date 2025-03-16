@@ -4,10 +4,10 @@ import logging
 import json
 import os
 
-from model.encoder import load_prompts
-from model.prompt import Prompt
+from server.model.encoder import load_prompts
+from server.model.prompt import Prompt
 
-from service.process import reset_prompts, get_prompts
+from server.service.process import reset_prompts, get_prompts
 
 logger = logging.getLogger("handler.prompt_routes")
 
