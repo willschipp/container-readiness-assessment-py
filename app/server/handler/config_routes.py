@@ -1,20 +1,22 @@
-import logging
+from loguru import logger
 
 from flask import Blueprint, request
 
-from config import config
-from model.encoder import class_to_json
+from .config import Config
+from server.model.encoder import class_to_json
 
 cfg = Blueprint('cfg',__name__)
 
-logger = logging.getLogger("handler.config_routes")
-
-@cfg.route('/api/config/<env>',methods=['GET'])
+@cfg.route("/api/config/<env>", methods=["GET"])
 def get_config(env):
-    logger.info("getting config")
-    current_config = config[env]
-    # scrub anything in this that is called 'secret' or 'key'
-    current_config.SECRET = ""
-    current_config.LLM_KEY = ""
-    # return
-    return class_to_json(current_config),200
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
+    logger.debug(f"env={env}")
+
+    # S3 config with secrets redacted
+    config = Config
+    config.s3_secret_access_key = ""
+    config.llm_key = ""
+
+    logger.debug(f"config={config}")
+    return class_to_json(config), 200
+

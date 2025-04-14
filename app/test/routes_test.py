@@ -13,14 +13,15 @@ class TestSubmitFiles(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.register_blueprint(main)
         self.client = self.app.test_client()
-        self.secret = os.getenv("SECRET")
+        self.secret = "mytestsecret"
         self.url = "localhost:9000"
-        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+        self.key = "mytestkey"
 
 
         load()
         # create the dev bucket if it doesn't exist
-        create_bucket("dev-bucket",self.url,self.key,self.secret)        
+        # create_bucket("dev-bucket",self.url,self.key,self.secret)        
+        create_bucket("dev-bucket")
 
     def tearDown(self):
         clean_up(self.url,self.key,self.secret)               

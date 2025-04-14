@@ -1,20 +1,19 @@
 from flask import Flask, send_from_directory
 from flask.logging import default_handler
-from logging_config import setup_logging
+from loguru import logger
 
 import os
 import sys
 
-from handler.routes import main as main_blueprint
-from handler.config_routes import cfg as main_config
-from handler.prompt_routes import prompt_handler as prompt_config
-from service.process import start_background
+from server.configuration import settings, Configuration
+from server.utils.log import Log, FlaskInterceptHandler
 
 
-# initial checks for keys being set
-if 'SECRET' not in os.environ:
-    print("SECRET for s3 not set... exiting\n")
-    sys.exit(1)
+from server.handler.routes import main as main_blueprint
+from server.handler.config_routes import cfg as main_config
+from server.handler.prompt_routes import prompt_handler as prompt_config
+from server.service.process import start_background
+
 
 def init_app(config_name='default'):
     app = Flask(__name__,static_folder='../frontend/build')
@@ -22,8 +21,8 @@ def init_app(config_name='default'):
     app.register_blueprint(main_config)
     app.register_blueprint(prompt_config)
     # logging
-    setup_logging()
     app.logger.removeHandler(default_handler) # remove the default
+    FlaskInterceptHandler.setup_default()
 
     return app
 

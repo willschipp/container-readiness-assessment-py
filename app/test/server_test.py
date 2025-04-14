@@ -17,13 +17,14 @@ class TestServer(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
 
-        self.secret = os.getenv("SECRET")
+        self.secret = "mytestsecret"
         self.url = "localhost:9000"
-        self.key = "Fkr0MyVrlIufkEyvWZ4z"
+        self.key = "mytestkey"
 
         load()
         # create the dev bucket if it doesn't exist
-        create_bucket("dev-bucket",self.url,self.key,self.secret)        
+        # create_bucket("dev-bucket",self.url,self.key,self.secret)        
+        create_bucket("dev-bucket")
 
     def tearDown(self):
         self.app_context.pop()

@@ -2,15 +2,13 @@ import json
 import logging
 import os
 import tempfile
+from loguru import logger
 
-from model.order import Order
-from model.job import Job
+from server.model.order import Order
+from server.model.job import Job
 
-from service.s3 import list_files, get_file, get_buckets
+from server.service.s3 import list_files, get_file, get_buckets
 
-from config import config
-
-logger = logging.getLogger("service.order_management")
 
 def get_job_by_order_id(order_id):
     # retrieve the job.json
