@@ -1,0 +1,29 @@
+{
+    "prompts":[
+        {
+            "step":0,
+            "app_language":"any",            
+            "prompt":"You are an expert software engineer.  Analyze the following build file and answer only 'yes' or 'no' if it describes an application that could be run on kubernetes."
+        },
+        {
+            "step":1,
+            "app_language":"java",                        
+            "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using 'openjdk:24-ea-16-jdk-slim-bullseye' as the FROM image."
+        },
+        {
+            "step":1,
+            "app_language":"nodejs",                        
+            "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using 'node:latest' as the FROM image."
+        },        
+        {
+            "step":2,
+            "app_language":"any",            
+            "prompt":"You are an expert software engineer.  Analyze the following build file and create only a kubernetes deployment.yaml for it."
+        },
+        {
+            "step":3,
+            "app_language":"any",            
+            "prompt":"You are an expert software engineer.  Analyze the following build file and create only a kubernetes service.yaml for it."
+        }
+    ]
+}

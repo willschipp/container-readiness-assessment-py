@@ -40,11 +40,11 @@ def get_prompts():
     return prompts
 
 def parse_response(reply: str):
-    if settings.llm_name == constants.LLM_NAME_GEMINI:
+    if settings.llm_name == constants.LLM_NAME_OLLAMA:
         logger.info("parsing ollama response")
         data = json.loads(reply)
         return data.get("response",None)
-    elif settings.llm_name == constants.LLM_NAME_OLLAMA:
+    elif settings.llm_name == constants.LLM_NAME_GEMINI:
         logger.info("parsing gemini response")
         # parse gemini
         response = parse_json_to_gemini_response(reply)
@@ -143,6 +143,7 @@ def step_is_self_contained(job: Job):
 def step_create_dockerfile(job: Job):
     # create a dockerfile for it
     #TODO include application logic choices
+    language = job.form.app_language
     # load up the prompts
     load()    
     # determine if the application is self-contained
@@ -151,7 +152,7 @@ def step_create_dockerfile(job: Job):
     config_text = clean_string(job.form.config_text)
     # get the prompts
     for p in prompts:
-        if p.step == 1:
+        if p.step == 1 and p.app_language == language:
             # use this one
             prompt_string = p.prompt + ' ' + config_text # add a string gap            
             break          
