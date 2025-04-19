@@ -81,7 +81,8 @@ def create_job(form: Form) -> str:
     job = Job(
         order_id=order_id,
         current_step=0,
-        form=form
+        form=form,
+        result=-1
     )
     # persist job object by writing it out to json
     json_string = json.dumps(job,cls=Encoder)
@@ -135,22 +136,6 @@ def step_get_language(job: Job):
         # log it
         logger.info(f"job {job.order_id} updated and saved")
 
-
-        # # if it has 'yes' --> increment the step in the job to '1'
-        # if 'yes'.lower() in answer.lower():
-        #     # update the job to step 1
-        #     job.current_step = 1
-        #     # save the job
-        #     json_string = json.dumps(job,cls=Encoder)
-        #     save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
-        #     # log it
-        #     logger.info(f"job {job.order_id} updated and saved")
-        # else:
-        #     # if it doesn't --> increment the step to '5' (exit out)
-        #     # update the job outcome
-        #     logger.info("Not able to containerize")
-        #     logger.debug(f"response {answer} for {job}")
-        #     step_finished_job(job)
         return
     except Exception as err:
         logger.error(f"error occurred - halted {err}")
@@ -186,6 +171,8 @@ def step_is_self_contained(job: Job):
         if 'yes'.lower() in answer.lower():
             # update the job to step 2
             job.current_step = 2
+            # set the results
+            job.result = 1
             # save the job
             json_string = json.dumps(job,cls=Encoder)
             save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
@@ -196,6 +183,7 @@ def step_is_self_contained(job: Job):
             # update the job outcome
             logger.info("Not able to containerize")
             logger.debug(f"response {answer} for {job}")
+            job.result = 0
             step_finished_job(job)
         return
     except Exception as err:
@@ -328,7 +316,7 @@ def step_create_service_yaml(job: Job):
 def step_finished_job(job: Job):
     # create the "finished.json" file and write it back
     save_string("",job.order_id,constants.FILE_NAME_FINISHED)
-
+    # finished
     logger.info(f"job {job.order_id} finished")
     return
 

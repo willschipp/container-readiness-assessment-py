@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button } from '@adobe/react-spectrum';
+import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button, Text } from '@adobe/react-spectrum';
 import ViewDetail from '@spectrum-icons/workflow/ViewDetail';
+import CheckmarkCircleOutline from '@spectrum-icons/workflow/CheckmarkCircleOutline';
+import CloseCircle from '@spectrum-icons/workflow/CloseCircle';
+import Refresh from '@spectrum-icons/workflow/Refresh';
+import SelectCircular from '@spectrum-icons/workflow/SelectCircular';
 
 function Orders() {
 
@@ -14,7 +18,8 @@ function Orders() {
             job: {
               form: {
                 app_language: "<none>"
-              }
+              },
+              result: -1
             },
             finished: true
           }]);
@@ -47,6 +52,14 @@ function Orders() {
 
     return (
         <Content width="calc(100% - size-1000)">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+                
+                <Button variant='primary' onPress={fetchData}>
+                    <Refresh/>
+                    <Text>Refresh</Text>
+                </Button>
+            </div>
+
             <TableView aria-label="Order">
                 <TableHeader>
                     <Column allowsResizing>Order ID</Column>
@@ -54,6 +67,7 @@ function Orders() {
                     <Column>User ID</Column>
                     <Column>Language</Column>
                     <Column>Status</Column>
+                    <Column>Result</Column>
                     <Column>Action</Column>
                 </TableHeader>
                 <TableBody>
@@ -62,8 +76,9 @@ function Orders() {
                             <Cell>{item.order_id}</Cell>
                             <Cell>{item.app_id}</Cell>
                             <Cell>{item.user_id}</Cell>
-                            <Cell>{item.job ? item.job.form.app_language : ''}</Cell>
+                            <Cell>{item.job ? item.job.form.app_language : ''}</Cell>                            
                             <Cell>{item.finished === true ? (<span>Finished</span>) : (<span>Running</span>)}</Cell>
+                            <Cell>{item.job.result === 1 ? (<span><CheckmarkCircleOutline/></span>) : item.job.result === 0 ? (<span><CloseCircle/></span>) : (<span><SelectCircular/></span>)}</Cell>
                             <Cell>
                                 <Button variant="primary" onPress={() => handleViewOrder(item.order_id)}>
                                     <ViewDetail/>

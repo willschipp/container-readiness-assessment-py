@@ -81,8 +81,6 @@ def get_languages():
 def get_files_list(order_id):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try :
-        # current_config = config[os.getenv('RUN_MODE','dev')]
-        # files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
         files = list_files_in_folder(order_id)
         response = []
         for file in files:
@@ -98,8 +96,6 @@ def get_files_list(order_id):
 def get_answers(order_id):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try :
-        # current_config = config[os.getenv('RUN_MODE','dev')]
-        # files = list_files(order_id,current_config.URL,current_config.KEY,current_config.SECRET)
         files = list_files_in_folder(order_id)
         response = []
         for file in files:
@@ -121,8 +117,6 @@ def get_answer(order_id,file_name):
 
         object_name = f"{order_id}/{file_name}"
 
-        # current_config = config[os.getenv('RUN_MODE','dev')]
-        # get_file(temp_file.name,order_id,file_name,current_config.URL,current_config.KEY,current_config.SECRET)
         get_file(object_name, temp_file.name)
         with open(temp_file.name,'r') as answer_file:
             data = json.load(answer_file)            
@@ -150,6 +144,29 @@ def download_file(order_id,file_id):
         # serve
         return send_file(temp_file.name,as_attachment=True,download_name=file_id)
         # TODO clean up
+    except Exception as err:
+        return jsonify({
+            "error":err
+        }),500
+    
+@main.route('/api/order/<order_id>/file/<file_id>/stream',methods=['GET'])
+def stream_file(order_id,file_id):
+    logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
+    try:
+        # setup the temporary file
+        # download from s3
+        # stream back
+        with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".tmp") as temp_file:
+            pass
+
+        object_name = f"{order_id}/{file_id}"
+        # current_config = config[os.getenv('RUN_MODE','dev')]
+        # get_file(temp_file.name,order_id,file_id,current_config.URL,current_config.KEY,current_config.SECRET)
+        get_file(object_name, temp_file.name)
+        # serve
+        with open(temp_file.name,'r') as usable_file:
+            file_content = usable_file.read()            
+        return file_content, 200, {'Content-type':'text/plain'}
     except Exception as err:
         return jsonify({
             "error":err

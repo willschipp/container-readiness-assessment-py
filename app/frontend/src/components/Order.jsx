@@ -4,6 +4,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Content, TableView, Column, Row, TableHeader, Cell, TableBody, Button, ButtonGroup, Text, Well } from '@adobe/react-spectrum';
 import Back from '@spectrum-icons/workflow/Back';
 import Download from '@spectrum-icons/workflow/Download';
+import CheckmarkCircleOutline from '@spectrum-icons/workflow/CheckmarkCircleOutline';
+import CloseCircle from '@spectrum-icons/workflow/CloseCircle';
+import Refresh from '@spectrum-icons/workflow/Refresh';
+import SelectCircular from '@spectrum-icons/workflow/SelectCircular';
 
 function Order() {
     const location = useLocation();
@@ -20,7 +24,7 @@ function Order() {
     const fetchData = async () => {
         try {
             //use the order id to retrieve
-            const response = await fetch('/api/order/' + orderId.trim());
+            const response = await fetch('/api/order/' + orderId.toString().trim());
             if (!response.ok) {
                 throw new Error(`http error! status: ${response.status}`);
             }
@@ -71,6 +75,10 @@ function Order() {
                         <Cell>Status</Cell>
                         <Cell>{data.finished === true ? (<span>Finished</span>) : (<span>Running</span>)}</Cell>
                     </Row>
+                    <Row>
+                        <Cell>Result</Cell>
+                        <Cell>{data.job ? data.job.result === 1 ? (<CheckmarkCircleOutline/>) : data.job.result === 0 ? (<CloseCircle/>) : (<SelectCircular/>) : (<SelectCircular/>)}</Cell>
+                    </Row>                    
                 </TableBody>
             </TableView>
             <Well>
@@ -86,7 +94,11 @@ function Order() {
                     <Button variant="secondary" onPress={handleBack}>
                         <Back/>
                         <Text>Back</Text>
-                    </Button>                
+                    </Button>
+                    <Button variant='primary' onPress={fetchData}>
+                        <Refresh/>
+                        <Text>Refresh</Text>
+                    </Button>                                    
                 </ButtonGroup>
             </Well>
         </Content>
