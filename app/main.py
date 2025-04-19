@@ -4,7 +4,7 @@ from flask import Flask, send_from_directory
 from server.configuration import settings, Configuration
 from server.utils.log import Log, FlaskInterceptHandler
 from server.handler.routes import main as main_blueprint
-from server.handker.config_routes import cfg as main_config
+from server.handler.config_routes import cfg as main_config
 from server.handler.prompt_routes import prompt_handler as prompt_config
 from server.service.process import start_background
 

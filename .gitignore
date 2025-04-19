@@ -8,3 +8,4 @@ frontend/package-lock.json
 .github/codespace_helper/mc
 .github/codespace_helper/minio
 .github/codespace_helper/nohup.out
+app/log/
