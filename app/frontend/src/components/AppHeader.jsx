@@ -12,7 +12,7 @@ function AppHeader() {
                 <Heading level={2}>
                     <DataCheck/>
                     &nbsp;
-                    Container Readiness Assessment Platform
+                    Container Readiness Platform
                 </Heading>
             </Header>
         </Content>

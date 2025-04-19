@@ -6,7 +6,18 @@ import ViewDetail from '@spectrum-icons/workflow/ViewDetail';
 
 function Orders() {
 
-    const [data, setData] = useState([]);
+    const [data, setData] = useState([
+        {
+            order_id: 0,
+            app_id: "<none>",
+            user_id: "<none>",
+            job: {
+              form: {
+                app_language: "<none>"
+              }
+            },
+            finished: true
+          }]);
 
     const navigate = useNavigate();
 
