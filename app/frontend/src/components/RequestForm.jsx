@@ -77,11 +77,11 @@ function RequestForm() {
         <Form onSubmit={handleSubmit}>
           <TextField label="Application ID" value={app_id} onChange={setAppId}/>
           <TextField label="User ID" value={user_id} onChange={setUserId}/>
-          <Picker label="Choose application language" onSelectionChange={setLangauge}>
+          {/* <Picker label="Choose application language" onSelectionChange={setLangauge}>
             { data.map(item => (
               <Item key={item}>{item}</Item>
             ))}
-          </Picker>
+          </Picker> */}
           <TextArea label="Copy & Paste your build file here" isRequired={true} value={config_text} onChange={setConfigText} height="size-3000"/>
           <Button type="submit" maxWidth="size-1000">Submit</Button>
         </Form>

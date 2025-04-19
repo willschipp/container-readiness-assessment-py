@@ -1,29 +1,38 @@
 {
     "prompts":[
         {
+            "step":-1,
+            "app_language":"any",            
+            "prompt":"You are an expert software engineer.  Analyze the following build file and answer which programming language is it for.  Answer with only the programming language name."
+        },        
+        {
             "step":0,
             "app_language":"any",            
             "prompt":"You are an expert software engineer.  Analyze the following build file and answer only 'yes' or 'no' if it describes an application that could be run on kubernetes."
         },
         {
             "step":1,
-            "app_language":"Java",                        
+            "app_language":"any",
+            "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using the most appropriate FROM image from the following list; 'openjdk:24-ea-16-jdk-slim-bullseye','node:latest','python-3.12.10:slim-bullseye'.  If the application is in C#, use a microsoft image."
+        },
+        {
+            "step":1,
+            "app_language":"java",                        
             "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using 'openjdk:24-ea-16-jdk-slim-bullseye' as the FROM image."
         },
         {
             "step":1,
-            "app_language":"NodeJS/React",                        
+            "app_language":"javascript",                        
             "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using 'node:latest' as the FROM image."
         },
         {
             "step":1,
-            "app_language":".NET Framework",                        
+            "app_language":"c#",                        
             "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using a Microsoft container image that can run on linux hosts as the FROM image."
         }, 
-
         {
             "step":1,
-            "app_language":"Python",                        
+            "app_language":"python",                        
             "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using 'python-3.12.10:slim-bullseye' as the FROM image."
         },                                
         {

@@ -15,7 +15,7 @@ from server.model.job import Job
 from server.model.response import parse_json_to_gemini_response
 from server.model.encoder import Encoder, load_prompts
 
-from server.service.s3 import list_folder_files, list_folders, get_file_from_folder, put_file_to_folder, is_file_in_folder
+from server.service.s3 import list_folders, get_file_from_folder, put_file_to_folder, is_file_in_folder
 from server.service.llm import clean_string, call_llm
 from server.service.file_formatter import convert_to_dockerfile, convert_to_yaml
 
@@ -94,6 +94,68 @@ def create_job(form: Form) -> str:
     # return
     return order_id
 
+
+def step_get_language(job: Job):
+    # load up the prompts
+    load()    
+    # determine if the application is self-contained
+    logger.debug(f"get language {job}")
+    # get the config text
+    config_text = clean_string(job.form.config_text)
+    # get the prompts
+    for p in prompts:
+        if p.step == -1:
+            # use this one
+            prompt_string = p.prompt + ' ' + config_text # add a string gap            
+            break          
+
+    # send to the LLM
+    try:
+        # result = call_gemini(prompt_string)
+        result = call_llm(prompt_string,settings.llm_name)
+        # now parse the string
+        logger.debug(f"result {result}")
+        # parse into the response
+        # response = parse_json_to_gemini_response(result)
+        # answer = response.candidates[0].content.parts[0].text #location of the detailed response
+        answer = parse_response(result)
+        # save the answer
+        save_string(result,job.order_id,"answer_0.json")
+
+        # the 'answer' is the language
+        logger.debug(f"answer {answer}")
+
+        # add to the job
+        job.form.app_language = answer.lower()
+        job.current_step = 1
+
+        # save the job
+        json_string = json.dumps(job,cls=Encoder)
+        save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
+        # log it
+        logger.info(f"job {job.order_id} updated and saved")
+
+
+        # # if it has 'yes' --> increment the step in the job to '1'
+        # if 'yes'.lower() in answer.lower():
+        #     # update the job to step 1
+        #     job.current_step = 1
+        #     # save the job
+        #     json_string = json.dumps(job,cls=Encoder)
+        #     save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
+        #     # log it
+        #     logger.info(f"job {job.order_id} updated and saved")
+        # else:
+        #     # if it doesn't --> increment the step to '5' (exit out)
+        #     # update the job outcome
+        #     logger.info("Not able to containerize")
+        #     logger.debug(f"response {answer} for {job}")
+        #     step_finished_job(job)
+        return
+    except Exception as err:
+        logger.error(f"error occurred - halted {err}")
+        return
+
 def step_is_self_contained(job: Job):
     # load up the prompts
     load()    
@@ -119,11 +181,11 @@ def step_is_self_contained(job: Job):
         # answer = response.candidates[0].content.parts[0].text #location of the detailed response
         answer = parse_response(result)
         # save the answer
-        save_string(result,job.order_id,"answer_0.json")
+        save_string(result,job.order_id,"answer_1.json")
         # if it has 'yes' --> increment the step in the job to '1'
         if 'yes'.lower() in answer.lower():
-            # update the job to step 1
-            job.current_step = 1
+            # update the job to step 2
+            job.current_step = 2
             # save the job
             json_string = json.dumps(job,cls=Encoder)
             save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
@@ -140,6 +202,7 @@ def step_is_self_contained(job: Job):
         logger.error(f"error occurred - halted {err}")
         return
 
+
 def step_create_dockerfile(job: Job):
     # create a dockerfile for it
     #TODO include application logic choices
@@ -150,9 +213,12 @@ def step_create_dockerfile(job: Job):
     logger.debug(f"dockerfile creation {job}")
     # get the config text
     config_text = clean_string(job.form.config_text)
+    # base
+    prompt_string = ""
     # get the prompts
     for p in prompts:
-        if p.step == 1 and p.app_language == language:
+        # if p.step == 1 and p.app_language == language:
+        if p.step == 1 and p.app_language == 'any':
             # use this one
             prompt_string = p.prompt + ' ' + config_text # add a string gap            
             break          
@@ -162,7 +228,7 @@ def step_create_dockerfile(job: Job):
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
-    save_string(result,job.order_id,"answer_1.json")
+    save_string(result,job.order_id,"answer_2.json")
     # get the answer and write it out as a docker file
     # response = parse_json_to_gemini_response(result)
     # answer = response.candidates[0].content.parts[0].text 
@@ -173,7 +239,7 @@ def step_create_dockerfile(job: Job):
     except Exception as err:
         logger.error(f"error occurred parsing dockerfile - continuing: {err}")
     # update the job to step 2
-    job.current_step = 2
+    job.current_step = 3
     # save the job
     json_string = json.dumps(job,cls=Encoder)
     save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
@@ -201,7 +267,7 @@ def step_create_deployment_yaml(job: Job):
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
-    save_string(result,job.order_id,"answer_2.json")
+    save_string(result,job.order_id,"answer_3.json")
 
     # response = parse_json_to_gemini_response(result)
     # answer = response.candidates[0].content.parts[0].text 
@@ -212,7 +278,7 @@ def step_create_deployment_yaml(job: Job):
     except Exception as err:
         logger.error(f"error occurred parsing deployment yaml - continuing: {err}")
     # update the job to step 3
-    job.current_step = 3
+    job.current_step = 4
     # save the job
     json_string = json.dumps(job,cls=Encoder)
     save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
@@ -239,7 +305,7 @@ def step_create_service_yaml(job: Job):
     # now parse the string
     logger.debug(f"result {result}")
     # save the answer
-    save_string(result,job.order_id,"answer_3.json")
+    save_string(result,job.order_id,"answer_4.json")
 
     # response = parse_json_to_gemini_response(result)
     # answer = response.candidates[0].content.parts[0].text 
@@ -250,7 +316,7 @@ def step_create_service_yaml(job: Job):
     except Exception as err:
         logger.error(f"error occurred parsing service yaml - continuing: {err}")
     # update the job to step 4 (finished)
-    job.current_step = 4
+    job.current_step = 5
     # save the job
     json_string = json.dumps(job,cls=Encoder)
     save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
@@ -266,14 +332,17 @@ def step_finished_job(job: Job):
     logger.info(f"job {job.order_id} finished")
     return
 
+
+
 def process_job(job: Job):
     # retrieve the current step
     currentStep = job.current_step
     switcher = {
-        0: step_is_self_contained,
-        1: step_create_dockerfile,
-        2: step_create_deployment_yaml,
-        3: step_create_service_yaml
+        0: step_get_language,
+        1: step_is_self_contained,
+        2: step_create_dockerfile,
+        3: step_create_deployment_yaml,
+        4: step_create_service_yaml
     }
     return switcher.get(currentStep,step_finished_job)(job)
 
