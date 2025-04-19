@@ -9,10 +9,6 @@ import xml.etree.ElementTree as Element
 import server.constants as constants
 from server.configuration import settings
 from server.model.response import GeminiResponse
-# from config import config
-# from logging_config import setup_logging
-
-# logger = logging.getLogger("service.llm")
 
 # Gemini Request Payload
 gemini_request_template = '''
@@ -57,9 +53,6 @@ def call_llm(prompt: str,name: str) -> str:
 def call_gemini(prompt: str) -> str:
     try:
         final_prompt = gemini_request_template.replace("CONTENT_HERE",prompt)
-
-        logger.debug(f"final prompt {final_prompt}")
-
         url = settings.llm_url_gemini
         url = url.replace("API_KEY",settings.LLM_KEY)
         headers = {constants.CONTENT_TYPE:constants.CONTENT_TYPE_JSON}

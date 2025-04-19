@@ -143,7 +143,7 @@ def download_file(order_id,file_id):
         with tempfile.NamedTemporaryFile(mode="w+",delete=False,suffix=".tmp") as temp_file:
             pass
 
-        object_name = f"{order_id}/{file_name}"
+        object_name = f"{order_id}/{file_id}"
         # current_config = config[os.getenv('RUN_MODE','dev')]
         # get_file(temp_file.name,order_id,file_id,current_config.URL,current_config.KEY,current_config.SECRET)
         get_file(object_name, temp_file.name)

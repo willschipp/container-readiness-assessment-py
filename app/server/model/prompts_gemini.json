@@ -7,14 +7,25 @@
         },
         {
             "step":1,
-            "app_language":"java",                        
+            "app_language":"Java",                        
             "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using 'openjdk:24-ea-16-jdk-slim-bullseye' as the FROM image."
         },
         {
             "step":1,
-            "app_language":"nodejs",                        
+            "app_language":"NodeJS/React",                        
             "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using 'node:latest' as the FROM image."
-        },        
+        },
+        {
+            "step":1,
+            "app_language":".NET Framework",                        
+            "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using a Microsoft container image that can run on linux hosts as the FROM image."
+        }, 
+
+        {
+            "step":1,
+            "app_language":"Python",                        
+            "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using 'python-3.12.10:slim-bullseye' as the FROM image."
+        },                                
         {
             "step":2,
             "app_language":"any",            
