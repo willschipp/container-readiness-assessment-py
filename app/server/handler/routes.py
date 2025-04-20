@@ -22,7 +22,7 @@ def load():
         logger.info("prompts loaded")
         prompts = load_prompts()
 
-@main.route('/api/order',methods=['POST'])
+@main.route('/order',methods=['POST'])
 def submit_files():
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     if request.is_json:
@@ -47,20 +47,20 @@ def submit_files():
             "error":"parsing json"
         }), 400
 
-@main.route('/api/order',methods=['GET'])
+@main.route('/order',methods=['GET'])
 def get_orders():
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     orders = get_all_orders()
     return jsonify(orders),200
 
-@main.route('/api/order/<order_id>',methods=['GET'])
+@main.route('/order/<order_id>',methods=['GET'])
 def get_order(order_id):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     order = get_job_by_order_id(order_id)
     return jsonify(order),200
 
 
-@main.route('/api/languages',methods=['GET'])
+@main.route('/languages',methods=['GET'])
 def get_languages():
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     #load the prompts
@@ -77,7 +77,7 @@ def get_languages():
     }),200
 
 
-@main.route('/api/order/<order_id>/files',methods=['GET'])
+@main.route('/order/<order_id>/files',methods=['GET'])
 def get_files_list(order_id):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try :
@@ -92,7 +92,7 @@ def get_files_list(order_id):
             "error":err
         }),500
     
-@main.route('/api/order/<order_id>/answer',methods=['GET'])
+@main.route('/order/<order_id>/answer',methods=['GET'])
 def get_answers(order_id):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try :
@@ -107,7 +107,7 @@ def get_answers(order_id):
             "error":err
         }),500    
 
-@main.route('/api/order/<order_id>/answer/<file_name>',methods=['GET'])
+@main.route('/order/<order_id>/answer/<file_name>',methods=['GET'])
 def get_answer(order_id,file_name):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     # get the explicit file, read it and stream the response to the browser
@@ -127,7 +127,7 @@ def get_answer(order_id,file_name):
         }),500
 
 
-@main.route('/api/download/<order_id>/<file_id>',methods=['GET'])
+@main.route('/download/<order_id>/<file_id>',methods=['GET'])
 def download_file(order_id,file_id):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try:
@@ -149,7 +149,7 @@ def download_file(order_id,file_id):
             "error":err
         }),500
     
-@main.route('/api/order/<order_id>/file/<file_id>/stream',methods=['GET'])
+@main.route('/order/<order_id>/file/<file_id>/stream',methods=['GET'])
 def stream_file(order_id,file_id):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     try:

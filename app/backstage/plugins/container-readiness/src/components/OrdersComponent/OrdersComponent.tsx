@@ -2,11 +2,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import {
   Table,
   TableColumn,
-  Progress,
   ResponseErrorPanel,
+  Progress,
 } from '@backstage/core-components';
-import useAsync from 'react-use/lib/useAsync';
-import { useApi, fetchApiRef  } from '@backstage/core-plugin-api';
+import useAsync from 'react-use/esm/useAsync';
 
 
 const useStyles = makeStyles({
@@ -70,22 +69,16 @@ export const DenseTable = ({ orders }: DenseTableProps) => {
 
 export const OrdersComponent = () => {
 
-  const fetchApi = useApi(fetchApiRef);
-
-  const { value, loading, error } = useAsync(async (): Promise<Order[]> => {
-    // go get
-    const response = await fetchApi.fetch('/api/cra/order') 
-    if (!response.ok) {
-      throw new Error("failed to get");
-    }
+  const { value, loading, error } = useAsync(async() : Promise<Order[]> => {
+    const response = await fetch('https://fluffy-space-bassoon-5xqrqjpxr6c4pqj-5000.app.github.dev/order');
     return response.json()
-  }, []);
+  })
 
   if (loading) {
     return <Progress />;
   } else if (error) {
-    console.log(error)
-    return <ResponseErrorPanel error={error} />;
+    console.error(error);
+    return <ResponseErrorPanel error={error} />;     
   }
 
   return <DenseTable orders={value || []} />;

@@ -22,14 +22,14 @@ def load():
     prompts = get_prompts()
 
 
-@prompt_handler.route('/api/prompts',methods=['GET'])
+@prompt_handler.route('/prompts',methods=['GET'])
 def get_orders():
     load()
     logger.info("getting all orders")
     return jsonify(prompts),200
 
 
-@prompt_handler.route('/api/prompts',methods=['POST'])
+@prompt_handler.route('/prompts',methods=['POST'])
 def submit_prompts():
     if request.is_json:
         data = request.get_json()

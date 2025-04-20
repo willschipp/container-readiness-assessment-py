@@ -1,6 +1,7 @@
 import os
 from loguru import logger
 from flask import Flask, send_from_directory
+from flask_cors import CORS
 from server.configuration import settings, Configuration
 from server.utils.log import Log, FlaskInterceptHandler
 from server.handler.routes import main as main_blueprint
@@ -17,6 +18,7 @@ app.register_blueprint(main_blueprint)
 app.register_blueprint(main_config)
 app.register_blueprint(prompt_config)
 FlaskInterceptHandler.setup_default()
+CORS(app)
 
 
 @app.route("/", defaults={"path": ""})

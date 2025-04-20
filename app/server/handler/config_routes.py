@@ -7,7 +7,7 @@ from server.model.encoder import class_to_json
 
 cfg = Blueprint('cfg',__name__)
 
-@cfg.route("/api/config/<env>", methods=["GET"])
+@cfg.route("/config/<env>", methods=["GET"])
 def get_config(env):
     logger.info(f"{request.method}, {request.path}, is_json={request.is_json}")
     logger.debug(f"env={env}")

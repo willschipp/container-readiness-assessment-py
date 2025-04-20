@@ -51,8 +51,9 @@ proxy:
   #     target: 'https://example.com'
   #     changeOrigin: true
   endpoints:
-    '/api/cra/':
+    '/container-readiness-api':
       target: 'https://fluffy-space-bassoon-5xqrqjpxr6c4pqj-5000.app.github.dev'
+      changeOrigin: true
 
 
 # Reference documentation http://backstage.io/docs/features/techdocs/configuration
@@ -68,9 +69,10 @@ techdocs:
 
 auth:
   # see https://backstage.io/docs/auth/ to learn about auth providers
-  providers:
-    # See https://backstage.io/docs/auth/guest/provider
-    guest: {}
+  dangerouslyDisableDefaultAuthPolicy: true
+  # providers:
+  #   # See https://backstage.io/docs/auth/guest/provider
+  #   guest: {}
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
