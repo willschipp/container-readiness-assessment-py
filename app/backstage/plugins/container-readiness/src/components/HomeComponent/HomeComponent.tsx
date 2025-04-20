@@ -1,4 +1,4 @@
-import { Typography, Grid } from '@material-ui/core';
+import { Typography, Grid, List, ListItem, ListItemText } from '@material-ui/core';
 import {
   InfoCard,
   Header,
@@ -25,23 +25,32 @@ export const HomeComponent = () => {
         <Grid item>
           <InfoCard title="Start an Assessment">
             <Typography variant="body1">
-              <p>
-                  Complete the form to identify your application, including the AppID, your user ID, what development language it is written in, and a copy of the build file.
-              </p>
-              <p>
-                  A build file could be;
-              </p>
-              <ul>
-                  <li>pom.xml</li>
-                  <li>build.gradle</li>
-                  <li>package.json</li>
-                  <li>requirements.txt</li>
-                  <li>app.csproj</li>
-                  <li>...and others!</li>
-              </ul>
-              <p>
-                Once you've completed the form, click "Submit" and you will receive an "Order ID".  Your from will be processed in the background.
-              </p>                
+              Complete the form to identify your application, including the AppID, your user ID, what development language it is written in, and a copy of the build file.
+              <br/>
+              A build file could be;
+            </Typography>
+            <List>
+              <ListItem>
+                <ListItemText primary="pom.xml"/>
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="build.gradle"/>
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="package.json"/>
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="requirements.txt"/>
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="app.csproj"/>
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="...and others!"/>
+              </ListItem>                                                                      
+            </List>
+            <Typography variant="body1">
+               Once you've completed the form, click "Submit" and you will receive an "Order ID".  Your from will be processed in the background.
             </Typography>
             <NewRequestForm/>
           </InfoCard>
