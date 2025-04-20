@@ -60,13 +60,16 @@ def get_job_by_order_id(order_id):
 def get_all_orders():
     orders = []
     # setup access
-    order_ids = list_folders()
-    logger.debug(f"number of order_ids = {len(order_ids)}")
-    for order_id in order_ids:
-        order = get_job_by_order_id(order_id)
-        if order is None:
-            logger.info(f"Order order_id {order_id} not found")
-        else:
-            orders.append(order)
+    try:
+        order_ids = list_folders()
+        logger.debug(f"number of order_ids = {len(order_ids)}")
+        for order_id in order_ids:
+            order = get_job_by_order_id(order_id)
+            if order is None:
+                logger.info(f"Order order_id {order_id} not found")
+            else:
+                orders.append(order)
+    except Exception as err:
+        logger.error(err)
               
     return orders

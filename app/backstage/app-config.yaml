@@ -51,10 +51,9 @@ proxy:
   #     target: 'https://example.com'
   #     changeOrigin: true
   endpoints:
-    '/container-readiness-api':
-      target: 'https://fluffy-space-bassoon-5xqrqjpxr6c4pqj-5000.app.github.dev'
-      changeOrigin: true
-
+  '/container-readiness-api':
+    target: 'http://localhost:5000'
+    changeOrigin: true
 
 # Reference documentation http://backstage.io/docs/features/techdocs/configuration
 # Note: After experimenting with basic setup, use CI/CD to generate docs
@@ -69,10 +68,9 @@ techdocs:
 
 auth:
   # see https://backstage.io/docs/auth/ to learn about auth providers
-  dangerouslyDisableDefaultAuthPolicy: true
-  # providers:
-  #   # See https://backstage.io/docs/auth/guest/provider
-  #   guest: {}
+  providers:
+    # See https://backstage.io/docs/auth/guest/provider
+    guest: {}
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options

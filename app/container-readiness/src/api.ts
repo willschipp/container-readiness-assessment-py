@@ -42,11 +42,11 @@ export class OrderApiClient implements OrderApiRef {
 
         const response = await this.fetchApi.fetch(`${proxyUri}${input}`, init);
         if (!response.ok) throw new Error(response.statusText);
-        return await response.json();
+        return await response.json()
     }
 
     async getOrders(): Promise<List<Order>> {
-        return await this.fetch<List<Order>>('/order');
+        return await this.fetch<List<Order>>('/orders');
     }
 
     async getOrder(orderId: string): Promise<Order> {

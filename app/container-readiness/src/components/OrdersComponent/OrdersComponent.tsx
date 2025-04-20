@@ -6,9 +6,6 @@ import {
   Progress,
 } from '@backstage/core-components';
 import useAsync from 'react-use/esm/useAsync';
-import { useState, useEffect } from 'react';
-import { OrderApiRef } from '../../api';
-import { useApi } from '@backstage/core-plugin-api';
 
 
 const useStyles = makeStyles({
@@ -72,33 +69,17 @@ export const DenseTable = ({ orders }: DenseTableProps) => {
 
 export const OrdersComponent = () => {
 
-  const apiClient = useApi(OrderApiRef);
-
-  const [orders, setOrders] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(null);
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const fetchedOrders = await apiClient.getOrders();
-        setOrders(fetchedOrders || []);
-      } catch (err) {
-        setError(err);
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [apiClient]);
+  const { value, loading, error } = useAsync(async() : Promise<Order[]> => {
+    const response = await fetch('http://localhost:5000/order');
+    return response.json()
+  })
 
   if (loading) {
     return <Progress />;
   } else if (error) {
-    return <ResponseErrorPanel error={error}/>
-  } else {
-    return <DenseTable orders={orders || []}  />;
+    console.error(error);
+    return <ResponseErrorPanel error={error} />;     
   }
+
+  return <DenseTable orders={value || []} />;
 };
