@@ -42,7 +42,10 @@ def main():
     logger.info(f"environment={settings.env_for_dynaconf}")
 
     # Background jobs
-    start_background()
+    run_background = os.getenv('BACKGROUND','run')
+    if run_background == 'run':
+        start_background()
+
 
     # Flask
     app.run(
