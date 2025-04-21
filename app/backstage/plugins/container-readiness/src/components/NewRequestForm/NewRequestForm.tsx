@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { TextField, Grid, Button } from '@material-ui/core';
+import { TextField, Grid, Button, Typography, List, ListItem, ListItemText } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { OrderApiRef } from '../../api';
+import { useApi } from '@backstage/core-plugin-api';
+import { InfoCard } from '@backstage/core-components';
+import { useRefresh } from '../../RefreshWrapper';
 
 
 interface FormValues {
@@ -22,7 +26,11 @@ const useStyles = makeStyles((theme) => ({
 
 export const NewRequestForm = () => {
 
-    const classes = useStyles();
+    const apiClient = useApi(OrderApiRef);
+
+    const [order, setOrder] = useState({})
+
+    const { triggerRefresh } = useRefresh();
 
     const [formValues, setFormValues] = useState<FormValues>({
         app_id: '',
@@ -34,35 +42,55 @@ export const NewRequestForm = () => {
         setFormValues({...formValues, [e.target.name]: e.target.value});
     }
 
+    const sendForm = async () => {
+        const response = await apiClient.postForm({
+            user_id: formValues.user_id,
+            app_id: formValues.app_id,
+            config_text: formValues.config_text                    
+        })
+        console.log(response)
+        triggerRefresh();
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log("invoked")
-        // build a 'form'
-        // submit it (POST) and get the response
-        // fetch('/api/order',{
-        //   method:'POST',
-        //   headers: {
-        //     'Content-type':'application/json'
-        //   },
-        //   body: JSON.stringify(
-        //     {
-        //       user_id: user_id,
-        //       app_id: app_id,
-        //       app_language: language,
-        //       config_text: config_text
-        //     }
-        //   ),
-        // }).then((response) => {
-        //   console.log('Sent')
-        //   // navigate('/orders');
-        // }).catch((error) => {
-        //   console.error(error);
-        // });
+        sendForm();
     }
 
 
     return (
-        <form onSubmit={handleSubmit}>
+        <Grid item>
+        <InfoCard title="Start an Assessment">
+          <Typography variant="body1">
+            Complete the form to identify your application, including the AppID, your user ID, what development language it is written in, and a copy of the build file.
+            <br/>
+            A build file could be;
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemText primary="pom.xml"/>
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="build.gradle"/>
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="package.json"/>
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="requirements.txt"/>
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="app.csproj"/>
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="...and others!"/>
+            </ListItem>                                                                      
+          </List>
+          <Typography variant="body1">
+             Once you've completed the form, click "Submit" and you will receive an "Order ID".  Your from will be processed in the background.
+          </Typography>
+          <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
                 <Grid item xs={12}> 
                     <TextField label="Application ID" name="app_id" value={formValues.app_id} onChange={handleChange} fullWidth required/>  
@@ -78,5 +106,8 @@ export const NewRequestForm = () => {
                 </Grid>                    
             </Grid>
         </form>
+        </InfoCard>
+      </Grid>
+
     )
 }

@@ -5,11 +5,11 @@ import {
   ResponseErrorPanel,
   Progress,
 } from '@backstage/core-components';
-import useAsync from 'react-use/esm/useAsync';
 import { useState, useEffect } from 'react';
 import { OrderApiRef } from '../../api';
 import { useApi } from '@backstage/core-plugin-api';
 
+import { useRefresh } from '../../RefreshWrapper';
 
 const useStyles = makeStyles({
   avatar: {
@@ -74,6 +74,8 @@ export const OrdersComponent = () => {
 
   const apiClient = useApi(OrderApiRef);
 
+  const { refreshKey } = useRefresh();
+
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(null);
@@ -92,7 +94,7 @@ export const OrdersComponent = () => {
     };
 
     fetchOrders();
-  }, [apiClient]);
+  }, [apiClient,refreshKey]);
 
   if (loading) {
     return <Progress />;
