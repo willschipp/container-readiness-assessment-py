@@ -1,4 +1,3 @@
-import { makeStyles } from '@material-ui/core/styles';
 import {
   Table,
   TableColumn,
@@ -7,17 +6,11 @@ import {
 } from '@backstage/core-components';
 import { useState, useEffect } from 'react';
 import { OrderApiRef } from '../../api';
-import { useApi } from '@backstage/core-plugin-api';
+import { useApi, useRouteRef } from '@backstage/core-plugin-api';
 
 import { useRefresh } from '../../RefreshWrapper';
+import { orderRouteRef } from '../../routes';
 
-const useStyles = makeStyles({
-  avatar: {
-    height: 32,
-    width: 32,
-    borderRadius: '50%',
-  },
-});
 
 type Order = {
   order_id: 0,
@@ -36,12 +29,17 @@ type DenseTableProps = {
   orders: Order[];
 };
 
+
 export const DenseTable = ({ orders }: DenseTableProps) => {
-  
-  const classes = useStyles();
+
+  const getOrderPath = useRouteRef(orderRouteRef);
 
   const columns: TableColumn[] = [
-    { title: 'Order ID', field: 'order_id' },
+    { title: 'Order ID', field: 'order_id', render: (rowData) => (
+      <a href={getOrderPath() + '/' + rowData.order_id} rel="noopener noreferrer">
+        {rowData.order_id}
+      </a>
+    ) },
     { title: 'App ID', field: 'app_id' },
     { title: 'User ID', field: 'user_id' },
     { title: 'Language', field: 'app_language' },

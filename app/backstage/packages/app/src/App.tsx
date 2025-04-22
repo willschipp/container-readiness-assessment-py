@@ -35,7 +35,7 @@ import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
-import { ContainerReadinessPage } from '@internal/plugin-container-readiness';
+import { ContainerReadinessOrderPage, ContainerReadinessPage } from '@internal/plugin-container-readiness';
 
 const app = createApp({
   apis,
@@ -95,7 +95,9 @@ const routes = (
     </Route>
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
-    <Route path="/container-readiness" element={<ContainerReadinessPage />} />
+    <Route path="/container-readiness" element={<ContainerReadinessPage />}>
+      <Route path="order" element={<ContainerReadinessOrderPage />}/>
+    </Route>
   </FlatRoutes>
 );
 

@@ -6,15 +6,14 @@ import {
   fetchApiRef,
 } from '@backstage/core-plugin-api';
 import { OrderApiRef, OrderApiClient } from './api';
-
-import { rootRouteRef } from './routes';
-
+import { orderRouteRef, rootRouteRef } from './routes';
 
 
 export const containerReadinessPlugin = createPlugin({
   id: 'container-readiness',
   routes: {
     root: rootRouteRef,
+    order: orderRouteRef,
   },
   apis: [
     createApiFactory({
@@ -34,5 +33,14 @@ export const ContainerReadinessPage = containerReadinessPlugin.provide(
     component: () =>
       import('./components/HomeComponent').then(m => m.HomeComponent),
     mountPoint: rootRouteRef,
+  }),
+);
+
+export const ContainerReadinessOrderPage = containerReadinessPlugin.provide(
+  createRoutableExtension({
+    name: 'ContainerReadinessOrderPage',
+    component: () =>
+      import('./components/OrderComponent').then(m => m.OrderComponent),
+    mountPoint: orderRouteRef,
   }),
 );

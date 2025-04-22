@@ -1,1 +1,1 @@
-export { containerReadinessPlugin, ContainerReadinessPage } from './plugin';
+export { containerReadinessPlugin, ContainerReadinessPage, ContainerReadinessOrderPage } from './plugin';
