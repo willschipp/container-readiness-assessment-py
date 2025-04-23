@@ -32,9 +32,19 @@ function Orders() {
             if (!response.ok) {
                 throw new Error(`http error! status: ${response.status}`);
             }
-            let result = await response.json();
-            setData(result);
-            console.log(result);
+            // let result = await response.json();
+            // setData(result);
+            // console.log(result);
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const result = await response.json();
+                setData(result);
+                console.log(result);
+            } else {
+                console.log(response)
+                throw new Error('Response is not JSON');
+            }            
         }
         catch (e) {
             console.error(e);
