@@ -145,7 +145,6 @@ def step_is_self_contained(job: Job):
     # load up the prompts
     load()    
     # determine if the application is self-contained
-    logger.debug(f"self contained {job}")
     # get the config text
     config_text = clean_string(job.form.config_text)
     # get the prompts
@@ -184,6 +183,10 @@ def step_is_self_contained(job: Job):
             logger.info("Not able to containerize")
             logger.debug(f"response {answer} for {job}")
             job.result = 0
+            # save the job
+            json_string = json.dumps(job,cls=Encoder)
+            save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
+            # finish the job
             step_finished_job(job)
         return
     except Exception as err:
