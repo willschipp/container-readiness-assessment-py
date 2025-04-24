@@ -8,7 +8,6 @@ import { useState, useEffect } from 'react';
 import { OrderApiRef } from '../../api';
 import { useApi, useRouteRef } from '@backstage/core-plugin-api';
 
-import { useRefresh } from '../../RefreshWrapper';
 import { orderRouteRef } from '../../routes';
 
 
