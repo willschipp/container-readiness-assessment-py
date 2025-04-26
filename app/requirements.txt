@@ -1,0 +1,7 @@
+dynaconf==3.2.10
+Flask==2.2.5
+flask-cors==5.0.1
+loguru==0.7.3
+minio==7.2.7
+requests==2.31.0
+PyYAML==6.0.1

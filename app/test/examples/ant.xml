@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ejb21-example" default="dist" basedir=".">
+
+  <!-- Properties -->
+  <property name="src.dir" value="src"/>
+  <property name="build.dir" value="build"/>
+  <property name="classes.dir" value="${build.dir}/classes"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="ejbjar.name" value="MyEJB.jar"/>
+
+  <!-- Paths -->
+  <path id="classpath">
+    <!-- Add your EJB 2.1 JARs here.  These are likely to be provided by your application server. -->
+    <pathelement location="${application.server.lib}/ejb.jar"/>  <!-- Example - replace with your actual path -->
+    <pathelement location="${application.server.lib}/jta.jar"/>   <!-- Example - replace with your actual path -->
+    <!-- Add other necessary libraries here -->
+  </path>
+
+
+  <!-- Compile EJB classes -->
+  <target name="compile">
+    <mkdir dir="${classes.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true" debuglevel="lines,vars,source" includeantruntime="false">
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+
+  <!-- Create the EJB JAR -->
+  <target name="jar" depends="compile">
+    <mkdir dir="${dist.dir}"/>
+    <jar destfile="${dist.dir}/${ejbjar.name}" basedir="${classes.dir}">
+      <!-- Add manifest file if needed (typically containing EJB deployment descriptors) -->
+      <manifest>
+        <attribute name="Manifest-Version" value="1.0"/>
+        <!-- Add other manifest attributes as required -->
+      </manifest>
+      <!-- Include deployment descriptor (ejb-jar.xml) -->
+      <fileset dir="${src.dir}" includes="META-INF/ejb-jar.xml"/>
+    </jar>
+  </target>
+
+  <!-- Main target -->
+  <target name="dist" depends="jar">
+    <echo message="EJB JAR created successfully at ${dist.dir}/${ejbjar.name}"/>
+  </target>
+
+</project>

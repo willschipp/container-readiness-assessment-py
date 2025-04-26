@@ -1,0 +1,11 @@
+{
+    "contents": [
+        {
+            "parts": [
+                {
+                    "text": "You are an expert software engineer.  Analyze the following build file and answer only 'yes' or 'no' if it describes an application that could be run on kubernetes. {\n  \"name\": \"frontend\",\n  \"version\": \"0.1.0\",\n  \"private\": true,\n  \"dependencies\": {\n    \"@adobe/react-spectrum\": \"^3.36.3\",\n    \"@spectrum-icons/workflow\": \"^4.2.15\",\n    \"@testing-library/react\": \"^13.0.0\",\n    \"@testing-library/user-event\": \"^13.2.1\",\n    \"axios\": \"^1.7.7\",\n    \"react\": \"^18.3.1\",\n    \"react-aria-components\": \"^1.3.3\",\n    \"react-dom\": \"^18.3.1\",\n    \"react-router-dom\": \"^6.26.2\",\n    \"react-spectrum\": \"^1.2.6\",\n    \"vanilla-framework\": \"^4.16.0\",\n    \"web-vitals\": \"^2.1.0\"\n  },\n  \"scripts\": {\n    \"start\": \"vite\",\n    \"build\": \"vite build\",\n    \"serve\": \"vite preview\"\n  },\n  \"eslintConfig\": {\n    \"extends\": [\n      \"react-app\"\n    ]\n  },\n  \"browserslist\": {\n    \"production\": [\n      \">0.2%\",\n      \"not dead\",\n      \"not op_mini all\"\n    ],\n    \"development\": [\n      \"last 1 chrome version\",\n      \"last 1 firefox version\",\n      \"last 1 safari version\"\n    ]\n  },\n  \"devDependencies\": {\n    \"@babel/plugin-proposal-private-property-in-object\": \"^7.21.11\",\n    \"@vitejs/plugin-react\": \"^4.3.2\",\n    \"sass\": \"^1.79.4\",\n    \"vite\": \"^5.4.8\"\n  }\n}"
+                }
+            ]
+        }
+    ]
+}

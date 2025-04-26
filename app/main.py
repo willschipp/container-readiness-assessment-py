@@ -4,7 +4,7 @@ from flask import Flask, send_from_directory
 from server.configuration import settings, Configuration
 from server.utils.log import Log, FlaskInterceptHandler
 from server.handler.routes import main as main_blueprint
-from server.handker.config_routes import cfg as main_config
+from server.handler.config_routes import cfg as main_config
 from server.handler.prompt_routes import prompt_handler as prompt_config
 from server.service.process import start_background
 
@@ -42,7 +42,10 @@ def main():
     logger.info(f"environment={settings.env_for_dynaconf}")
 
     # Background jobs
-    start_background()
+    run_background = os.getenv('BACKGROUND','run')
+    if run_background == 'run':
+        start_background()
+
 
     # Flask
     app.run(

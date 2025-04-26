@@ -22,7 +22,7 @@ function Menu() {
     return (
         <Content margin="size-200">
             <Heading level={3}>
-                Functions
+                Menu
             </Heading>
             <ListBox
                 aria-label="Menu"

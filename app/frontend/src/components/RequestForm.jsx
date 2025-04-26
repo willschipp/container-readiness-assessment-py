@@ -68,19 +68,21 @@ function RequestForm() {
                   <li>build.gradle</li>
                   <li>package.json</li>
                   <li>requirements.txt</li>
+                  <li>app.csproj</li>
+                  <li>...and others!</li>
               </ul>
               <p>
                 Once you've completed the form, click "Submit" and you will receive an "Order ID".  Your from will be processed in the background.
               </p>
-        <Form onSubmit={handleSubmit} maxWidth="size-5000">
+        <Form onSubmit={handleSubmit}>
           <TextField label="Application ID" value={app_id} onChange={setAppId}/>
           <TextField label="User ID" value={user_id} onChange={setUserId}/>
-          <Picker label="Choose application language" onSelectionChange={setLangauge}>
+          {/* <Picker label="Choose application language" onSelectionChange={setLangauge}>
             { data.map(item => (
               <Item key={item}>{item}</Item>
             ))}
-          </Picker>
-          <TextArea label="Copy & Paste your build file here" isRequired={true} value={config_text} onChange={setConfigText}/>
+          </Picker> */}
+          <TextArea label="Copy & Paste your build file here" isRequired={true} value={config_text} onChange={setConfigText} height="size-3000"/>
           <Button type="submit" maxWidth="size-1000">Submit</Button>
         </Form>
       </Content>
