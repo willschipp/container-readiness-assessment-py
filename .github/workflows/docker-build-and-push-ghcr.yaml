@@ -10,7 +10,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}        
 
       - name: 'Build Inventory Image'
         working-directory: ./app
