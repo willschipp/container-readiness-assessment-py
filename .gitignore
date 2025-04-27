@@ -10,3 +10,4 @@ frontend/package-lock.json
 .github/codespace_helper/nohup.out
 app/log/
 .secrets.toml
+kubectl*
