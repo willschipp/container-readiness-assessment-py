@@ -70,6 +70,7 @@ def save_string(content: str,folder_name: str,obj_name: str):
     os.remove(temp_file_path)
 
 def is_pass(percentage_string):
+    logger.info(f"percentage string {percentage_string}")
     try:
         if percentage_string.endswith("%"):
             number = float(percentage_string[:-1])
@@ -81,15 +82,20 @@ def is_pass(percentage_string):
         raise ValueError("Invalid percentage string format")
 
 def get_prompt(step,app_language,config_text):
+    logger.info(f"step {step} | app language {app_language}")
     target_language = 'any'
-    if app_language == 'java':
+    if 'java' in app_language and 'javascript' not in app_language:
         # it's a java app, use that
         target_language = 'java'
+    # setup
+    prompt_string = ""
+    # find the prompt
     for p in prompts:
         if p.step == step and p.app_language == target_language:
             # use this one
             prompt_string = p.prompt + ' ' + config_text # add a string gap            
             break          
+    return prompt_string
 
 
 def create_job(form: Form) -> str:
@@ -160,15 +166,12 @@ def step_is_self_contained(job: Job):
     # load up the prompts
     load()    
     # determine if the application is self-contained
+    # language
+    language = job.form.app_language
     # get the config text
     config_text = clean_string(job.form.config_text)
-    # get the prompts
-    for p in prompts:
-        if p.step == 0:
-            # use this one
-            prompt_string = p.prompt + ' ' + config_text # add a string gap            
-            break          
-
+    # get the prompt
+    prompt_string = get_prompt(0,language,config_text)
     # send to the LLM
     try:
         result = call_llm(prompt_string,settings.llm_name)
@@ -179,12 +182,8 @@ def step_is_self_contained(job: Job):
         # save the answer
         save_string(result,job.order_id,"answer_1.json")
 
-        # convert the answer to a number and evaluate
-        can_containerize = is_pass(answer)
-
-        # if it has 'yes' --> increment the step in the job to '1'
-        # if 'yes'.lower() in answer.lower():
-        if can_containerize:
+        # check if the response is a 'yes/no' or a percentage
+        if 'yes'.lower() in answer.lower():
             # update the job to step 2
             job.current_step = 2
             # set the results
@@ -194,7 +193,7 @@ def step_is_self_contained(job: Job):
             save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
             # log it
             logger.info(f"job {job.order_id} updated and saved")
-        else:
+        elif 'no'.lower() in answer.lower():
             # if it doesn't --> increment the step to '5' (exit out)
             # update the job outcome
             logger.info("Not able to containerize")
@@ -205,6 +204,31 @@ def step_is_self_contained(job: Job):
             save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
             # finish the job
             step_finished_job(job)
+        else:
+            # convert the answer to a number and evaluate
+            can_containerize = is_pass(answer)
+            # eval
+            if can_containerize:
+                # update the job to step 2
+                job.current_step = 2
+                # set the results
+                job.result = 1
+                # save the job
+                json_string = json.dumps(job,cls=Encoder)
+                save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
+                # log it
+                logger.info(f"job {job.order_id} updated and saved")
+            else:
+                # if it doesn't --> increment the step to '5' (exit out)
+                # update the job outcome
+                logger.info("Not able to containerize")
+                logger.debug(f"response {answer} for {job}")
+                job.result = 0
+                # save the job
+                json_string = json.dumps(job,cls=Encoder)
+                save_string(json_string,job.order_id,constants.FILE_NAME_JOB)
+                # finish the job
+                step_finished_job(job)
         return
     except Exception as err:
         logger.error(f"error occurred - halted {err}")
