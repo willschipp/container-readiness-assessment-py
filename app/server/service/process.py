@@ -63,16 +63,33 @@ def save_string(content: str,folder_name: str,obj_name: str):
         temp_file.write(content)
         temp_file_path = temp_file.name
 
-    # file is written --> save
-    # current_config = config[os.getenv('RUN_MODE','dev')]
-
-    # save_file(temp_file_path,bucket_name,obj_name,current_config.URL,current_config.KEY,current_config.SECRET)
-    # save_file_in_folder(temp_file_path, folder_name, bucket_name, obj_name, current_config.URL,current_config.KEY,current_config.SECRET)
     put_file_to_folder(temp_file_path,folder_name,obj_name)
 
     logger.info(f"file {obj_name} saved")
     # clean up the file
     os.remove(temp_file_path)
+
+def is_pass(percentage_string):
+    try:
+        if percentage_string.endswith("%"):
+            number = float(percentage_string[:-1])
+        else:
+            number = float(percentage_string)
+
+        return number >= 80.0
+    except ValueError:
+        raise ValueError("Invalid percentage string format")
+
+def get_prompt(step,app_language,config_text):
+    target_language = 'any'
+    if app_language == 'java':
+        # it's a java app, use that
+        target_language = 'java'
+    for p in prompts:
+        if p.step == step and p.app_language == target_language:
+            # use this one
+            prompt_string = p.prompt + ' ' + config_text # add a string gap            
+            break          
 
 
 def create_job(form: Form) -> str:
@@ -117,8 +134,6 @@ def step_get_language(job: Job):
         # now parse the string
         logger.debug(f"result {result}")
         # parse into the response
-        # response = parse_json_to_gemini_response(result)
-        # answer = response.candidates[0].content.parts[0].text #location of the detailed response
         answer = parse_response(result)
         # save the answer
         save_string(result,job.order_id,"answer_0.json")
@@ -156,18 +171,20 @@ def step_is_self_contained(job: Job):
 
     # send to the LLM
     try:
-        # result = call_gemini(prompt_string)
         result = call_llm(prompt_string,settings.llm_name)
         # now parse the string
         logger.debug(f"result {result}")
         # parse into the response
-        # response = parse_json_to_gemini_response(result)
-        # answer = response.candidates[0].content.parts[0].text #location of the detailed response
         answer = parse_response(result)
         # save the answer
         save_string(result,job.order_id,"answer_1.json")
+
+        # convert the answer to a number and evaluate
+        can_containerize = is_pass(answer)
+
         # if it has 'yes' --> increment the step in the job to '1'
-        if 'yes'.lower() in answer.lower():
+        # if 'yes'.lower() in answer.lower():
+        if can_containerize:
             # update the job to step 2
             job.current_step = 2
             # set the results
@@ -240,18 +257,20 @@ def step_create_dockerfile(job: Job):
 
 def step_create_deployment_yaml(job: Job):
     # create a deployment yaml for the application
+    language = job.form.app_language
     # load up the prompts
     load()    
     # determine if the application is self-contained
     logger.debug(f"deployment yaml creation {job}")
     # get the config text
     config_text = clean_string(job.form.config_text)
+    prompt_string = get_prompt(2,language,config_text)
     # get the prompts
-    for p in prompts:
-        if p.step == 2:
-            # use this one
-            prompt_string = p.prompt + ' ' + config_text # add a string gap            
-            break          
+    # for p in prompts:
+    #     if p.step == 2:
+    #         # use this one
+    #         prompt_string = p.prompt + ' ' + config_text # add a string gap            
+    #         break          
 
     # send to the LLM
     result = call_llm(prompt_string,settings.llm_name)
