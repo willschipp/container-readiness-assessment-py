@@ -11,6 +11,11 @@
             "prompt":"You are an expert software engineer.  Analyze the following build file and answer only 'yes' or 'no' if it describes an application that could be run on kubernetes."
         },
         {
+            "step":0,
+            "app_language":"java",
+            "prompt":"You are an expert software engineer. Analyze the following build file and answer with only the probability in percentage if the application built using it can be deployed on kubernetes. If the build file includes spring-boot-start-parent, do not include it in your considerations. Only consider dependencies explicitly described and if they support standalone startup. Exclude the absence of kubernetes specific and docker files in your considerations; these files will be added later. BUIILD_FILE="
+        },        
+        {
             "step":1,
             "app_language":"any",
             "prompt":"You are an expert software engineer.  Analyze the following build file and generate only a Dockerfile using the most appropriate FROM image from the following list; 'openjdk:24-ea-16-jdk-slim-bullseye','node:latest','python-3.12.10:slim-bullseye'.  If the application is in C#, use a microsoft image."
@@ -40,6 +45,11 @@
             "app_language":"any",            
             "prompt":"You are an expert software engineer.  Analyze the following build file and create only a kubernetes deployment.yaml for it."
         },
+        {
+            "step":2,
+            "app_language":"java",
+            "prompt":"You are an expert software engineer. Analyze the following build file and create only a kubernetes deployment.yaml for it. Consider if an endpoint is provided by the build file to support a liveness or readiness probe, excluding them if there is not an explicity dependency. Create placeholders for external service configuration based on any explicit dependencies in the build file."
+        },        
         {
             "step":3,
             "app_language":"any",            

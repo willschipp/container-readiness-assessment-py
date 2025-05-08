@@ -11,3 +11,4 @@ frontend/package-lock.json
 app/log/
 .secrets.toml
 kubectl*
+*.key

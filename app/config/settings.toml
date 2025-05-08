@@ -40,8 +40,8 @@ llm_prompts_steps = 4
 [local] # Default environment
 # S3
 s3_bucket_name = 'dev-bucket'
-s3_access_key_id = 'dW5epRZ2rmKJBqtUgRqB'
-s3_secret_access_key = 'QURhOQ2TSWWRyV1rPwP2MnRnWOCSWZIFuLJu5krH'
+s3_access_key_id = 'nuahgGg5uRVT1rTcb0pG'
+s3_secret_access_key = 'Bnr6o8ewzGAXbCGcYPKFz1VKhm6C55qMdQYdI1IJ'
 
 [development]
 # S3
